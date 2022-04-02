@@ -37,7 +37,7 @@ namespace miModul
 	typedef struct ModulIOMapEntry_t
 	{
 		uint32_t SubAddress;
-		IOImageSize_t BitSize;
+		IOImageSize BitSize;
 		IOImageOffset_t IoImageBitOffset;
 		ModulIOMapDirections Direction;
 	}ModulIOMapEntry;
@@ -68,8 +68,8 @@ namespace miModul
 		};
 
 		virtual Modulresult Init() = 0;
-		virtual Modulresult Read() = 0;
-		virtual Modulresult Write() = 0;
+		virtual Modulresult ReadInputToIOImage() = 0;
+		virtual Modulresult WriteOutputFromImage() = 0;
 		virtual Modulresult Deinit() = 0;
 
 	};

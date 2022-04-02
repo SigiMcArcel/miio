@@ -12,7 +12,7 @@ miIOImage::IOImage::IOImage()
 {
 }
 
-IOImage::IOImage(IOImageSize_t size,IOImageType type)
+IOImage::IOImage(IOImageSize size,IOImageType type)
 	:_valid(false)
 	, _IOImageMem(nullptr)
 	, _IOImageByteSize(0)
@@ -38,7 +38,7 @@ IOImage::~IOImage()
 
 }
 
-const IOImageSize_t IOImage::IOImageByteSize() const
+const IOImageSize IOImage::IOImageByteSize() const
 {
 	return _IOImageByteSize;
 }
@@ -53,7 +53,23 @@ const IOImagePointer_t miIOImage::IOImage::Memory() const
 	return _IOImageMem;
 }
 
-IOImageResult IOImage::CopyTo(IOImageSize_t byteOffset, const IOImage& destination, const IOImageSize_t destinationByteOffset, IOImageSize_t size) const
+void miIOImage::IOImage::setValueError(IOImageResult error, IOImageSize bitOffset)
+{
+	_InvalidValueBitOffset = bitOffset;
+	_State = error;
+}
+
+const IOImageSize miIOImage::IOImage::InvalidValueBitOffset() const
+{
+	return _InvalidValueBitOffset;
+}
+
+const IOImageResult miIOImage::IOImage::State() const
+{
+	return _State;
+}
+
+IOImageResult IOImage::CopyTo(IOImageSize byteOffset, const IOImage& destination, const IOImageSize destinationByteOffset, IOImageSize size) const
 {
 	if (!_valid)
 	{
@@ -87,7 +103,7 @@ IOImageResult IOImage::CopyTo(IOImageSize_t byteOffset, const IOImage& destinati
 	return IOImageResult::Ok;
 }
 
-IOImageResult miIOImage::IOImage::CopyFrom(IOImageSize_t byteOffset, const IOImage& source, const IOImageSize_t sourceByteOffset, IOImageSize_t size) const
+IOImageResult miIOImage::IOImage::CopyFrom(IOImageSize byteOffset, const IOImage& source, const IOImageSize sourceByteOffset, IOImageSize size) const
 {
 	if (!_valid)
 	{
@@ -118,7 +134,7 @@ IOImageResult miIOImage::IOImage::CopyFrom(IOImageSize_t byteOffset, const IOIma
 
 }
 
-IOImageResult miIOImage::IOImage::Write(IOImageSize_t byteOffset, void* data, IOImageSize_t size) const
+IOImageResult miIOImage::IOImage::Write(IOImageSize byteOffset, void* data, IOImageSize size) const
 {
 	if (data == nullptr)
 	{
@@ -139,7 +155,7 @@ IOImageResult miIOImage::IOImage::Write(IOImageSize_t byteOffset, void* data, IO
 	return IOImageResult();
 }
 
-IOImageResult miIOImage::IOImage::Read(IOImageSize_t byteOffset, void* data, IOImageSize_t size) const
+IOImageResult miIOImage::IOImage::Read(IOImageSize byteOffset, void* data, IOImageSize size) const
 {
 	if (data == nullptr)
 	{
@@ -160,10 +176,10 @@ IOImageResult miIOImage::IOImage::Read(IOImageSize_t byteOffset, void* data, IOI
 	return IOImageResult();
 }
 
-IOImageResult miIOImage::IOImage::WriteBit(IOImageSize_t bitOffset, bool value) const
+IOImageResult miIOImage::IOImage::WriteBit(IOImageSize bitOffset, bool value) const
 {
 	IOImageResult result = IOImageResult::Ok;
-	IOImageSize_t byteOffset = bitOffset / 8;
+	IOImageSize byteOffset = bitOffset / 8;
 	int bitNumber = static_cast<int>(bitOffset % 8);
 	int bitmask = bitNumber << 1;
 	uint8_t byteVal = 0;
@@ -186,28 +202,32 @@ IOImageResult miIOImage::IOImage::WriteBit(IOImageSize_t bitOffset, bool value) 
 	return Write(byteOffset, &byteVal, 1);
 }
 
-IOImageResult miIOImage::IOImage::WriteUint8(IOImageSize_t byteOffset, uint8_t value) const
+IOImageResult miIOImage::IOImage::WriteUint8(IOImageSize byteOffset, uint8_t value) const
 {
 	
 	return Write(byteOffset, &value, sizeof(uint8_t));
 }
 
-IOImageResult miIOImage::IOImage::WriteUint16(IOImageSize_t byteOffset, uint16_t value) const
+IOImageResult miIOImage::IOImage::WriteUint16(IOImageSize byteOffset, uint16_t value) const
 {
 	return Write(byteOffset, &value, sizeof(uint16_t));
 }
 
-IOImageResult miIOImage::IOImage::WriteUint32(IOImageSize_t byteOffset, uint32_t value) const
+IOImageResult miIOImage::IOImage::WriteUint32(IOImageSize byteOffset, uint32_t value) const
 {
 	return Write(byteOffset, &value, sizeof(uint32_t));
 }
 
-bool miIOImage::IOImage::ReadBit(IOImageSize_t bitOffset, IOImageResult* result) const
+bool miIOImage::IOImage::ReadBit(IOImageSize bitOffset, IOImageResult* result) const
 {
-	IOImageSize_t byteOffset = bitOffset / 8;
+	IOImageResult resultIntern = IOImageResult::Ok;
+	IOImageSize byteOffset = bitOffset / 8;
 	uint8_t bitNumber = static_cast<uint8_t>(bitOffset % 8);
 	uint8_t bitmask = bitNumber << 1;
 	uint8_t byteVal = 0;
+
+	if (result != nullptr) { result = &resultIntern; }
+
 	*result = Read(byteOffset, &byteVal, 1);
 	if (*result != IOImageResult::Ok)
 	{
@@ -220,9 +240,11 @@ bool miIOImage::IOImage::ReadBit(IOImageSize_t bitOffset, IOImageResult* result)
 	return false;
 }
 
-uint8_t miIOImage::IOImage::ReadUint8(IOImageSize_t byteOffset, IOImageResult* result) const
+uint8_t miIOImage::IOImage::ReadUint8(IOImageSize byteOffset, IOImageResult* result) const
 {
+	IOImageResult resultIntern = IOImageResult::Ok;
 	uint8_t val = 0;
+	if (result != nullptr) { result = &resultIntern; }
 	*result = Read(byteOffset, &val, sizeof(uint8_t));
 	if (*result != IOImageResult::Ok)
 	{
@@ -231,9 +253,11 @@ uint8_t miIOImage::IOImage::ReadUint8(IOImageSize_t byteOffset, IOImageResult* r
 	return val;
 }
 
-uint16_t miIOImage::IOImage::ReadUint16(IOImageSize_t byteOffset, IOImageResult* result) const
+uint16_t miIOImage::IOImage::ReadUint16(IOImageSize byteOffset, IOImageResult* result) const
 {
+	IOImageResult resultIntern = IOImageResult::Ok;
 	uint16_t val = 0;
+	if (result != nullptr) { result = &resultIntern; }
 	*result = Read(byteOffset, &val, sizeof(uint16_t));
 	if (*result != IOImageResult::Ok)
 	{
@@ -242,9 +266,11 @@ uint16_t miIOImage::IOImage::ReadUint16(IOImageSize_t byteOffset, IOImageResult*
 	return val;
 }
 
-uint32_t miIOImage::IOImage::ReadUint32(IOImageSize_t byteOffset, IOImageResult* result) const
+uint32_t miIOImage::IOImage::ReadUint32(IOImageSize byteOffset, IOImageResult* result) const
 {
+	IOImageResult resultIntern = IOImageResult::Ok;
 	uint32_t val = 0;
+	if (result != nullptr) { result = &resultIntern; }
 	*result = Read(byteOffset, &val, sizeof(uint32_t));
 	if (*result != IOImageResult::Ok)
 	{

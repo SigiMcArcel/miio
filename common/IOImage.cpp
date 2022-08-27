@@ -16,15 +16,9 @@ IOImage::IOImage(IOImageSize size,IOImageType type)
 	:_valid(false)
 	, _IOImageMem(nullptr)
 	, _IOImageByteSize(0)
-	, _IOImageType(IOImageType::None)
+	, _IOImageType(type)
 {
-	_IOImageMem = new uint8_t[size]();
-	if (_IOImageMem == nullptr)
-	{
-		return;
-	}
-	_IOImageByteSize = size;
-	_valid = true;
+	
 }
 
 IOImage::~IOImage()
@@ -48,7 +42,7 @@ bool IOImage::Valid() const
 	return false;
 }
 
-const IOImagePointer_t miIOImage::IOImage::Memory() const
+const IOImagePointer miIOImage::IOImage::Memory() const
 {
 	return _IOImageMem;
 }
@@ -67,6 +61,34 @@ const IOImageSize miIOImage::IOImage::InvalidValueBitOffset() const
 const IOImageResult miIOImage::IOImage::State() const
 {
 	return _State;
+}
+
+
+
+IOImageResult miIOImage::IOImage::AddRange(IOImageSize size, IOImageSize byteOffset)
+{
+	return IOImageResult();
+}
+
+IOImageResult miIOImage::IOImage::Remove(const IOImage& image)
+{
+	return IOImageResult();
+}
+
+IOImageResult miIOImage::IOImage::Alloc()
+{
+	if (_IOImageByteSize == 0)
+	{
+		return IOImageResult::InvalidParameter;
+	}
+	_IOImageMem = new uint8_t[_IOImageByteSize]();
+	if (_IOImageMem == nullptr)
+	{
+		_valid = false;
+		return IOImageResult::InvalidMemory;
+	}
+	_valid = true;
+	return IOImageResult::Ok;
 }
 
 IOImageResult IOImage::CopyTo(IOImageSize byteOffset, const IOImage& destination, const IOImageSize destinationByteOffset, IOImageSize size) const
@@ -176,6 +198,11 @@ IOImageResult miIOImage::IOImage::Read(IOImageSize byteOffset, void* data, IOIma
 	return IOImageResult();
 }
 
+IOImagePath miIOImage::IOImage::ResolveIoImagePath(std::string path)
+{
+	return IOImagePath();
+}
+
 IOImageResult miIOImage::IOImage::WriteBit(IOImageSize bitOffset, bool value) const
 {
 	IOImageResult result = IOImageResult::Ok;
@@ -240,6 +267,31 @@ bool miIOImage::IOImage::ReadBit(IOImageSize bitOffset, IOImageResult* result) c
 	return false;
 }
 
+IOImageResult miIOImage::IOImage::WriteUint32(const std::string& name, uint32_t value) const
+{
+	return IOImageResult();
+}
+
+bool miIOImage::IOImage::ReadBit(const std::string& name, IOImageResult* result) const
+{
+	return false;
+}
+
+uint8_t miIOImage::IOImage::ReadUint8(const std::string& name, IOImageResult* result) const
+{
+	return uint8_t();
+}
+
+uint16_t miIOImage::IOImage::ReadUint16(const std::string& name, IOImageResult* result) const
+{
+	return uint16_t();
+}
+
+uint32_t miIOImage::IOImage::ReadUint32(const std::string& name, IOImageResult* result) const
+{
+	return uint32_t();
+}
+
 uint8_t miIOImage::IOImage::ReadUint8(IOImageSize byteOffset, IOImageResult* result) const
 {
 	IOImageResult resultIntern = IOImageResult::Ok;
@@ -277,5 +329,20 @@ uint32_t miIOImage::IOImage::ReadUint32(IOImageSize byteOffset, IOImageResult* r
 		return 0;
 	}
 	return val;
+}
+
+IOImageResult miIOImage::IOImage::WriteBit(const std::string& name, bool value) const
+{
+	return IOImageResult();
+}
+
+IOImageResult miIOImage::IOImage::WriteUint8(const std::string& name, uint8_t value) const
+{
+	return IOImageResult();
+}
+
+IOImageResult miIOImage::IOImage::WriteUint16(const std::string& name, uint16_t value) const
+{
+	return IOImageResult();
 }
 

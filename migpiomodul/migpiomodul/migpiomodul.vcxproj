@@ -84,18 +84,24 @@
     <TargetExt>.so</TargetExt>
   </PropertyGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\common\cModulBase.h" />
+    <ClInclude Include="..\..\common\ModulBase.h" />
     <ClInclude Include="..\..\common\IOImage.h" />
-    <ClInclude Include="cGPIOModul.h" />
+    <ClInclude Include="GPIOModul.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\common\ModulBase.cpp" />
     <ClCompile Include="..\..\common\IOImage.cpp" />
-    <ClCompile Include="cGPIOModul.cpp" />
+    <ClCompile Include="GPIOModul.cpp" />
   </ItemGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">
     <ClCompile>
-      <AdditionalIncludeDirectories>..\..\common\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\common\;..\..\Drivers\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <CppLanguageStandard>c++20</CppLanguageStandard>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>..\..\common\;..\..\Drivers\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

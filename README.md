@@ -1,2 +1,2 @@
-# miModuls
-IO Moduls libraries for machina imaginis
+# miio
+IO managing library for machina imaginis

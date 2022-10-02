@@ -34,22 +34,16 @@
       <Platform>x64</Platform>
     </ProjectConfiguration>
   </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="IOImage.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="IOImage.h" />
-  </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{2AFC79CE-72C4-45E0-B3E7-3E962DA10F06}</ProjectGuid>
+    <ProjectGuid>{DDD27CCF-2D81-414E-915A-9E0455A2DD5F}</ProjectGuid>
     <Keyword>Linux</Keyword>
-    <RootNamespace>miioimage</RootNamespace>
+    <RootNamespace>mitestmodul</RootNamespace>
     <MinimumVisualStudioVersion>15.0</MinimumVisualStudioVersion>
     <ApplicationType>Linux</ApplicationType>
     <ApplicationTypeRevision>1.0</ApplicationTypeRevision>
     <TargetLinuxPlatform>Generic</TargetLinuxPlatform>
     <LinuxProjectType>{2238F9CD-F817-4ECC-BD14-2524D2669B35}</LinuxProjectType>
-    <ProjectName>miioimage</ProjectName>
+    <ProjectName>mitestodul</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'" Label="Configuration">
@@ -90,19 +84,32 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">
     <TargetExt>.so</TargetExt>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'">
+    <TargetExt>.so</TargetExt>
+  </PropertyGroup>
+  <ItemGroup>
+    <ClInclude Include="..\miiomodule\IOModulBase.h" />
+    <ClInclude Include="Modul.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\miiomodule\IOModulBase.cpp" />
+    <ClCompile Include="Modul.cpp" />
+  </ItemGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">
     <ClCompile>
-      <AdditionalIncludeDirectories>..\..\common\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\common\;..\..\Drivers\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <CppLanguageStandard>c++20</CppLanguageStandard>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>..\..\common\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <CppLanguageStandard>c++11</CppLanguageStandard>
+      <AdditionalIncludeDirectories>..\..\common\;..\..\Drivers\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
+    <Link>
+      <LibraryDependencies>midriver;miioimage</LibraryDependencies>
+    </Link>
     <RemotePostBuildEvent>
-      <Command>cp $(RemoteDebuggerCommand) /usr/lib &amp;&amp; cp $(RemoteDeployDir)/IOImage.h /usr/include/mi/miio</Command>
+      <Command>cp $(RemoteDebuggerCommand) /usr/lib</Command>
     </RemotePostBuildEvent>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

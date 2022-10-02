@@ -147,6 +147,17 @@ public:
 	IOManagerResult StartIOCycle(int cycleTime);
 	IOManagerResult StopIOCycle();
 	IOManagerResult IOModulControl(const std::string& name,const std::string function,uint32_t parameter);
+
+	const miIOImage::IOImage& OutputImage() const
+	{
+		return _OutputImage;
+	}
+
+	const miIOImage::IOImage& InputImage() const
+	{
+		return _InputImage;
+	}
+	
 		
 
 	// Geerbt über EventListener

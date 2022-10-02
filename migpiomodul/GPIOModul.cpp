@@ -113,11 +113,19 @@ IOModulResult GPIOModul::open(const std::string& configuration)
 		return IOModulResult::ErrorConf;
 	}
 	const rapidjson::Value& mimoduldescription = d["mimoduldescription"];
+
+	if (!mimoduldescription.HasMember("name"))
+	{
+		return  IOModulResult::ErrorConf;
+	}
+	const rapidjson::Value& name = mimoduldescription["name"];
+
 	if (!mimoduldescription.HasMember("modulconf"))
 	{
 		return IOModulResult::ErrorConf;
 	}
 	const rapidjson::Value& modulconf = mimoduldescription["modulconf"];
+	
 	if (!modulconf.HasMember("gpiopins"))
 	{
 		return IOModulResult::ErrorConf;
@@ -216,7 +224,7 @@ IOModulResult miModul::GPIOModul::writeOutputs(const miIOImage::IOImage& image, 
 	{
 		return IOModulResult::ErrorNotConfigured;
 	}
-	val = image.ReadBit(map.Offset(), &imageResult);
+	val = image.ReadBit(map.Offset(), imageResult);
 	if (imageResult != miIOImage::IOImageResult::Ok)
 	{
 		return IOModulResult::ErrorRead;

@@ -69,12 +69,6 @@ IOManagerResult miIOManager::IOManager::ReadConfig(const std::string& configurat
         return IOManagerResult::ErrorConfiguration;
     }
     const rapidjson::Value& name = mimoduldescription["name"];
-    if (!mimoduldescription.HasMember("modulconf"))
-    {
-        return IOManagerResult::ErrorConfiguration;
-    }
-    const rapidjson::Value& modulconf = mimoduldescription["modulconf"];
-
 
     result = ReadIOMaps(mimoduldescription, std::string("imaps"), iMaps);
     if(result != IOManagerResult::Ok)
@@ -161,8 +155,8 @@ IOManagerResult IOManager::ReadIOMaps(const rapidjson::Value& d,std::string key,
 }
 
 IOManager::IOManager(miIOImage::IOImageSize inputImageSize, miIOImage::IOImageSize outputImageSize)
-	:_InputImage(inputImageSize, miIOImage::IOImageType::Input)
-	, _OutputImage(outputImageSize, miIOImage::IOImageType::Output)
+	:_InputImage(inputImageSize, miIOImage::IOImageType::Input,"input")
+	, _OutputImage(outputImageSize, miIOImage::IOImageType::Output,"output")
     , _Timer("buscycle",this)
 {
 

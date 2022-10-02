@@ -11,6 +11,10 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "miioimage", "miioimage\miio
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "miiomanager", "miiomanager\miiomanager.vcxproj", "{A5E38D44-6A3D-48D0-BD66-E4F417883D3D}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Modules", "Modules", "{C60A920D-3C27-4959-8CA2-C0A11F26CCFE}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "mitestodul", "mitestmodul\mitestmodul.vcxproj", "{DDD27CCF-2D81-414E-915A-9E0455A2DD5F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|ARM = Debug|ARM
@@ -111,9 +115,37 @@ Global
 		{A5E38D44-6A3D-48D0-BD66-E4F417883D3D}.Release|x64.Build.0 = Release|x64
 		{A5E38D44-6A3D-48D0-BD66-E4F417883D3D}.Release|x86.ActiveCfg = Release|x86
 		{A5E38D44-6A3D-48D0-BD66-E4F417883D3D}.Release|x86.Build.0 = Release|x86
+		{DDD27CCF-2D81-414E-915A-9E0455A2DD5F}.Debug|ARM.ActiveCfg = Debug|ARM
+		{DDD27CCF-2D81-414E-915A-9E0455A2DD5F}.Debug|ARM.Build.0 = Debug|ARM
+		{DDD27CCF-2D81-414E-915A-9E0455A2DD5F}.Debug|ARM.Deploy.0 = Debug|ARM
+		{DDD27CCF-2D81-414E-915A-9E0455A2DD5F}.Debug|ARM64.ActiveCfg = Debug|ARM64
+		{DDD27CCF-2D81-414E-915A-9E0455A2DD5F}.Debug|ARM64.Build.0 = Debug|ARM64
+		{DDD27CCF-2D81-414E-915A-9E0455A2DD5F}.Debug|ARM64.Deploy.0 = Debug|ARM64
+		{DDD27CCF-2D81-414E-915A-9E0455A2DD5F}.Debug|x64.ActiveCfg = Debug|x64
+		{DDD27CCF-2D81-414E-915A-9E0455A2DD5F}.Debug|x64.Build.0 = Debug|x64
+		{DDD27CCF-2D81-414E-915A-9E0455A2DD5F}.Debug|x64.Deploy.0 = Debug|x64
+		{DDD27CCF-2D81-414E-915A-9E0455A2DD5F}.Debug|x86.ActiveCfg = Debug|x86
+		{DDD27CCF-2D81-414E-915A-9E0455A2DD5F}.Debug|x86.Build.0 = Debug|x86
+		{DDD27CCF-2D81-414E-915A-9E0455A2DD5F}.Debug|x86.Deploy.0 = Debug|x86
+		{DDD27CCF-2D81-414E-915A-9E0455A2DD5F}.Release|ARM.ActiveCfg = Release|ARM
+		{DDD27CCF-2D81-414E-915A-9E0455A2DD5F}.Release|ARM.Build.0 = Release|ARM
+		{DDD27CCF-2D81-414E-915A-9E0455A2DD5F}.Release|ARM.Deploy.0 = Release|ARM
+		{DDD27CCF-2D81-414E-915A-9E0455A2DD5F}.Release|ARM64.ActiveCfg = Release|ARM64
+		{DDD27CCF-2D81-414E-915A-9E0455A2DD5F}.Release|ARM64.Build.0 = Release|ARM64
+		{DDD27CCF-2D81-414E-915A-9E0455A2DD5F}.Release|ARM64.Deploy.0 = Release|ARM64
+		{DDD27CCF-2D81-414E-915A-9E0455A2DD5F}.Release|x64.ActiveCfg = Release|x64
+		{DDD27CCF-2D81-414E-915A-9E0455A2DD5F}.Release|x64.Build.0 = Release|x64
+		{DDD27CCF-2D81-414E-915A-9E0455A2DD5F}.Release|x64.Deploy.0 = Release|x64
+		{DDD27CCF-2D81-414E-915A-9E0455A2DD5F}.Release|x86.ActiveCfg = Release|x86
+		{DDD27CCF-2D81-414E-915A-9E0455A2DD5F}.Release|x86.Build.0 = Release|x86
+		{DDD27CCF-2D81-414E-915A-9E0455A2DD5F}.Release|x86.Deploy.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{A228ED89-2367-4391-AA6A-BA2FAB16FE45} = {C60A920D-3C27-4959-8CA2-C0A11F26CCFE}
+		{DDD27CCF-2D81-414E-915A-9E0455A2DD5F} = {C60A920D-3C27-4959-8CA2-C0A11F26CCFE}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {1CF255D3-C9BC-4BD5-9364-90EFB32D353A}

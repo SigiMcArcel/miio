@@ -1,35 +1,72 @@
 #include "IOImage.h"
 #include "cstring"
+
+
 using namespace miIOImage;
 
-
-
 miIOImage::IOImage::IOImage()
-	:_valid(false)
+	:_Valid(false)
 	,_IOImageMem(nullptr)
 	, _IOImageByteSize(0)
 	, _IOImageType(IOImageType::None)
 {
+	_InstanceCounter = 0;
 }
 
-IOImage::IOImage(IOImageSize size,IOImageType type)
-	:_valid(false)
+IOImage::IOImage(IOImageSize size,IOImageType type, std::string name)
+	:_Valid(false)
 	, _IOImageMem(nullptr)
-	, _IOImageByteSize(0)
+	, _IOImageByteSize(size)
 	, _IOImageType(type)
+	,_Name(name)
 {
 	
+	if (Alloc() == IOImageResult::Ok)
+	{
+		_InstanceCounter++;
+	}
+	printf("init constructor instance = %d\n", _InstanceCounter);
 }
 
+IOImage::IOImage(const IOImage& other)
+	:_Valid(other._Valid)
+	, _IOImageMem(other._IOImageMem)
+	, _IOImageByteSize(other._IOImageByteSize)
+	, _IOImageType(other._IOImageType)
+
+{
+	_InstanceCounter++;
+	printf("copy constructor instance = %d  from %s\n", _InstanceCounter, other._Name.c_str());
+}
 IOImage::~IOImage()
 {
-	if (_IOImageMem != nullptr)
+	printf("deconstructor instance = %d\n", _InstanceCounter);
+	_InstanceCounter--;
+	if (_InstanceCounter == 0)
 	{
-		delete _IOImageMem;
+		printf("deconstructor deleted\n");
 		_IOImageByteSize = 0;
-		_valid = false;
+		_Valid = false;
+		delete _IOImageMem;
+		_IOImageMem = nullptr;
+		_InstanceCounter = 0;
 	}
+	if (_InstanceCounter < 0)
+	{
+		_InstanceCounter = 0;
+	}
+	
 
+}
+IOImage& miIOImage::IOImage::operator=(const IOImage& other)
+{
+	_InstanceCounter++;
+	printf("assigne instance = %d from %s\n", _InstanceCounter,other._Name.c_str());
+	return *this;
+}
+IOImageValue miIOImage::IOImage::operator[](int offset)
+{
+	return IOImageValue(*this);
 }
 
 const IOImageSize IOImage::IOImageByteSize() const
@@ -47,12 +84,6 @@ const IOImagePointer miIOImage::IOImage::Memory() const
 	return _IOImageMem;
 }
 
-void miIOImage::IOImage::setValueError(IOImageResult error, IOImageSize bitOffset)
-{
-	_InvalidValueBitOffset = bitOffset;
-	_State = error;
-}
-
 const IOImageSize miIOImage::IOImage::InvalidValueBitOffset() const
 {
 	return _InvalidValueBitOffset;
@@ -63,37 +94,25 @@ const IOImageResult miIOImage::IOImage::State() const
 	return _State;
 }
 
-
-
-IOImageResult miIOImage::IOImage::AddRange(IOImageSize size, IOImageSize byteOffset)
-{
-	return IOImageResult();
-}
-
-IOImageResult miIOImage::IOImage::Remove(const IOImage& image)
-{
-	return IOImageResult();
-}
-
 IOImageResult miIOImage::IOImage::Alloc()
 {
 	if (_IOImageByteSize == 0)
 	{
 		return IOImageResult::InvalidParameter;
 	}
-	_IOImageMem = new IOImageByte[_IOImageByteSize]();
+	_IOImageMem = new uint8_t[_IOImageByteSize];
 	if (_IOImageMem == nullptr)
 	{
-		_valid = false;
+		_Valid = false;
 		return IOImageResult::InvalidMemory;
 	}
-	_valid = true;
+	_Valid = true;
 	return IOImageResult::Ok;
 }
 
 IOImageResult IOImage::CopyTo(IOImageSize byteOffset, const IOImage& destination, const IOImageSize destinationByteOffset, IOImageSize size) const
 {
-	if (!_valid)
+	if (!_Valid)
 	{
 		return IOImageResult::InvalidMemory;
 	}
@@ -127,7 +146,7 @@ IOImageResult IOImage::CopyTo(IOImageSize byteOffset, const IOImage& destination
 
 IOImageResult miIOImage::IOImage::CopyFrom(IOImageSize byteOffset, const IOImage& source, const IOImageSize sourceByteOffset, IOImageSize size) const
 {
-	if (!_valid)
+	if (!_Valid)
 	{
 		return IOImageResult::InvalidMemory;
 	}
@@ -162,7 +181,7 @@ IOImageResult miIOImage::IOImage::Write(IOImageSize byteOffset, void* data, IOIm
 	{
 		return IOImageResult::InvalidParameter;
 	}
-	if (!_valid)
+	if (!_Valid)
 	{
 		return IOImageResult::InvalidMemory;
 	}
@@ -174,7 +193,8 @@ IOImageResult miIOImage::IOImage::Write(IOImageSize byteOffset, void* data, IOIm
 	{
 		return IOImageResult::ErrorRangeExceeded;
 	}
-	return IOImageResult();
+	std::memcpy(_IOImageMem + byteOffset, data , size);
+	return IOImageResult::Ok;
 }
 
 IOImageResult miIOImage::IOImage::Read(IOImageSize byteOffset, void* data, IOImageSize size) const
@@ -183,7 +203,7 @@ IOImageResult miIOImage::IOImage::Read(IOImageSize byteOffset, void* data, IOIma
 	{
 		return IOImageResult::InvalidParameter;
 	}
-	if (!_valid)
+	if (!_Valid)
 	{
 		return IOImageResult::InvalidMemory;
 	}
@@ -195,12 +215,8 @@ IOImageResult miIOImage::IOImage::Read(IOImageSize byteOffset, void* data, IOIma
 	{
 		return IOImageResult::ErrorRangeExceeded;
 	}
-	return IOImageResult();
-}
-
-IOImagePath miIOImage::IOImage::ResolveIoImagePath(std::string path)
-{
-	return IOImagePath();
+	std::memcpy(data, _IOImageMem + byteOffset, size);
+	return IOImageResult::Ok;
 }
 
 IOImageResult miIOImage::IOImage::WriteBit(IOImageSize bitOffset, bool value) const
@@ -245,18 +261,16 @@ IOImageResult miIOImage::IOImage::WriteUint32(IOImageSize byteOffset, uint32_t v
 	return Write(byteOffset, &value, sizeof(uint32_t));
 }
 
-bool miIOImage::IOImage::ReadBit(IOImageSize bitOffset, IOImageResult* result) const
+bool miIOImage::IOImage::ReadBit(IOImageSize bitOffset, IOImageResult& result) const
 {
-	IOImageResult resultIntern = IOImageResult::Ok;
 	IOImageSize byteOffset = bitOffset / 8;
 	uint8_t bitNumber = static_cast<uint8_t>(bitOffset % 8);
 	uint8_t bitmask = bitNumber << 1;
 	uint8_t byteVal = 0;
 
-	if (result != nullptr) { result = &resultIntern; }
 
-	*result = Read(byteOffset, &byteVal, 1);
-	if (*result != IOImageResult::Ok)
+	result = Read(byteOffset, &byteVal, 1);
+	if (result != IOImageResult::Ok)
 	{
 		return false;
 	}
@@ -267,82 +281,37 @@ bool miIOImage::IOImage::ReadBit(IOImageSize bitOffset, IOImageResult* result) c
 	return false;
 }
 
-IOImageResult miIOImage::IOImage::WriteUint32(const std::string& name, uint32_t value) const
+uint8_t miIOImage::IOImage::ReadUint8(IOImageSize byteOffset, IOImageResult& result) const
 {
-	return IOImageResult();
-}
-
-bool miIOImage::IOImage::ReadBit(const std::string& name, IOImageResult* result) const
-{
-	return false;
-}
-
-uint8_t miIOImage::IOImage::ReadUint8(const std::string& name, IOImageResult* result) const
-{
-	return uint8_t();
-}
-
-uint16_t miIOImage::IOImage::ReadUint16(const std::string& name, IOImageResult* result) const
-{
-	return uint16_t();
-}
-
-uint32_t miIOImage::IOImage::ReadUint32(const std::string& name, IOImageResult* result) const
-{
-	return uint32_t();
-}
-
-uint8_t miIOImage::IOImage::ReadUint8(IOImageSize byteOffset, IOImageResult* result) const
-{
-	IOImageResult resultIntern = IOImageResult::Ok;
 	uint8_t val = 0;
-	if (result != nullptr) { result = &resultIntern; }
-	*result = Read(byteOffset, &val, sizeof(uint8_t));
-	if (*result != IOImageResult::Ok)
+	result = Read(byteOffset, &val, sizeof(uint8_t));
+	if (result != IOImageResult::Ok)
 	{
 		return 0;
 	}
 	return val;
 }
 
-uint16_t miIOImage::IOImage::ReadUint16(IOImageSize byteOffset, IOImageResult* result) const
+uint16_t miIOImage::IOImage::ReadUint16(IOImageSize byteOffset, IOImageResult& result) const
 {
-	IOImageResult resultIntern = IOImageResult::Ok;
 	uint16_t val = 0;
-	if (result != nullptr) { result = &resultIntern; }
-	*result = Read(byteOffset, &val, sizeof(uint16_t));
-	if (*result != IOImageResult::Ok)
+	result = Read(byteOffset, &val, sizeof(uint16_t));
+	if (result != IOImageResult::Ok)
 	{
 		return 0;
 	}
 	return val;
 }
 
-uint32_t miIOImage::IOImage::ReadUint32(IOImageSize byteOffset, IOImageResult* result) const
+uint32_t miIOImage::IOImage::ReadUint32(IOImageSize byteOffset, IOImageResult& result) const
 {
-	IOImageResult resultIntern = IOImageResult::Ok;
 	uint32_t val = 0;
-	if (result != nullptr) { result = &resultIntern; }
-	*result = Read(byteOffset, &val, sizeof(uint32_t));
-	if (*result != IOImageResult::Ok)
+	result = Read(byteOffset, &val, sizeof(uint32_t));
+	if (result != IOImageResult::Ok)
 	{
 		return 0;
 	}
 	return val;
 }
 
-IOImageResult miIOImage::IOImage::WriteBit(const std::string& name, bool value) const
-{
-	return IOImageResult();
-}
-
-IOImageResult miIOImage::IOImage::WriteUint8(const std::string& name, uint8_t value) const
-{
-	return IOImageResult();
-}
-
-IOImageResult miIOImage::IOImage::WriteUint16(const std::string& name, uint16_t value) const
-{
-	return IOImageResult();
-}
 

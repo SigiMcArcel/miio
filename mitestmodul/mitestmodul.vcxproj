@@ -95,6 +95,9 @@
     <ClCompile Include="..\miiomodule\IOModulBase.cpp" />
     <ClCompile Include="Modul.cpp" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="mitestmodul.json" />
+  </ItemGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">
     <ClCompile>
       <AdditionalIncludeDirectories>..\..\common\;..\..\Drivers\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>

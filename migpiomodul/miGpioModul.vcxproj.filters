@@ -16,5 +16,13 @@
     <Filter Include="miiomodule">
       <UniqueIdentifier>{b1383f6d-78ed-4561-a368-09d0c37f89dd}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Description">
+      <UniqueIdentifier>{ff0cfe24-1427-4173-82fd-602e1da6c23c}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="config.json">
+      <Filter>Description</Filter>
+    </None>
   </ItemGroup>
 </Project>

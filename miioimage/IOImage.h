@@ -6,6 +6,7 @@
 #include <array>
 #include <type_traits>
 #include <memory>
+
 /// <summary>
 /// Interface for machina imaginis control
 /// abstracts several IO's or IO Interfaces like gpio.SPI,i2c etc
@@ -28,9 +29,7 @@ namespace miIOImage
 		bool b7 : 1;
 	}Bits;
 	
-
 	typedef uint32_t IOImageOffset;
-
 	typedef uint32_t IOImageSize;
 	typedef uint8_t* IOImagePointer;
 
@@ -68,8 +67,9 @@ namespace miIOImage
 		ArrayOfUint8
 	}IOValueType;
 
-	
 	class IOImageValue;
+
+	
 
 	class IOImage
 	{
@@ -78,26 +78,18 @@ namespace miIOImage
 		IOImagePointer _IOImageMem;
 		IOImageSize _IOImageByteSize;
 		IOImageType _IOImageType;
-		IOImageSize _InvalidValueBitOffset;
 		IOImageResult _State;
 		std::string _Name;
-		
-
 
 		IOImageResult Alloc();
 		
-		
-
 	public:
-
 		IOImage();
 		IOImage(IOImageSize size, IOImageType type, std::string name);
 		IOImage(const IOImage& other);
 		~IOImage();
-		IOImageValue operator[] (int index);
-		IOImage& operator=(const IOImage& other);
+		const IOImage& operator=(const IOImage& other);
 		
-
 		//get set
 		const IOImageSize IOImageByteSize() const;
 		bool Valid() const;
@@ -106,7 +98,6 @@ namespace miIOImage
 		const IOImageResult State() const;
 
 		//functions
-		
 		IOImageResult CopyTo(IOImageSize byteOffset, const IOImage& destination, IOImageSize destinationByteOffset, IOImageSize size) const;
 		IOImageResult CopyFrom(IOImageSize byteOffset, const IOImage& source, IOImageSize destinationByteOffset, IOImageSize size) const;
 
@@ -125,25 +116,4 @@ namespace miIOImage
 		
 	};
 
-	class IOImageValue
-	{
-
-	private:
-		IOImage _IoImage;
-		IOImageValue(const IOImage& image)
-			:_IoImage(image)
-		{
-
-		}
-	public:
-		uint8_t operator=(uint8_t val)
-		{
-			return 0;
-		}
-		operator uint8_t()
-		{
-			return 0;
-		}
-		friend class IOImage;
-	};
 }

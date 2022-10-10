@@ -33,7 +33,6 @@ IOImage::IOImage(const IOImage& other)
 	, _IOImageMem(other._IOImageMem)
 	, _IOImageByteSize(other._IOImageByteSize)
 	, _IOImageType(other._IOImageType)
-
 {
 	_InstanceCounter++;
 	printf("copy constructor instance = %d  from %s\n", _InstanceCounter, other._Name.c_str());
@@ -58,15 +57,16 @@ IOImage::~IOImage()
 	
 
 }
-IOImage& miIOImage::IOImage::operator=(const IOImage& other)
+
+const IOImage& miIOImage::IOImage::operator=(const IOImage& other)
 {
 	_InstanceCounter++;
+	_Valid = other._Valid;
+	_IOImageMem = other._IOImageMem;
+	_IOImageByteSize = other._IOImageByteSize;
+	_IOImageType = other._IOImageType;
 	printf("assigne instance = %d from %s\n", _InstanceCounter,other._Name.c_str());
 	return *this;
-}
-IOImageValue miIOImage::IOImage::operator[](int offset)
-{
-	return IOImageValue(*this);
 }
 
 const IOImageSize IOImage::IOImageByteSize() const
@@ -82,11 +82,6 @@ bool IOImage::Valid() const
 const IOImagePointer miIOImage::IOImage::Memory() const
 {
 	return _IOImageMem;
-}
-
-const IOImageSize miIOImage::IOImage::InvalidValueBitOffset() const
-{
-	return _InvalidValueBitOffset;
 }
 
 const IOImageResult miIOImage::IOImage::State() const

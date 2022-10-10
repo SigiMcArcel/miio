@@ -37,6 +37,7 @@ namespace miModul
 
 	public:
 		GPIOModul();
+		virtual ~GPIOModul();
 
 		// Geerbt über IOModulBase
 		virtual IOModulResult Init();
@@ -44,19 +45,19 @@ namespace miModul
 
 
 		// Geerbt über IOModulInterface
-		virtual IOModulResult open(const std::string& configuration) override;
+		virtual IOModulResult Open(const std::string& configuration) override;
 
-		virtual IOModulResult start() override;
+		virtual IOModulResult Start() override;
 
-		virtual IOModulResult stop() override;
+		virtual IOModulResult Stop() override;
 
-		virtual IOModulResult close() override;
+		virtual IOModulResult Close() override;
 
-		virtual IOModulResult readInputs(const miIOImage::IOImage& image,  const IOModulIOMap& map) override;
+		virtual IOModulResult ReadInputs(const miIOImage::IOImage& image,  const IOModulIOMap& map) override;
 
-		virtual IOModulResult writeOutputs(const miIOImage::IOImage& image, const IOModulIOMap& map) override;
+		virtual IOModulResult WriteOutputs(const miIOImage::IOImage& image, const IOModulIOMap& map) override;
 
-		virtual IOModulResult control(const std::string name, const std::string function, uint32_t parameter) override;
+		virtual IOModulResult Control(const std::string name, const std::string function, uint32_t parameter) override;
 
 	};
 }

@@ -1,6 +1,9 @@
 #pragma once
 #include <stdint.h>
 #include <string>
+#include <rapidjson/document.h>
+#include <rapidjson/writer.h>
+#include <rapidjson/stringbuffer.h>
 #include <map>
 #include <mi/miio/IOImage.h>
 #include <mi/miio/IOModulInterface.h>
@@ -23,30 +26,26 @@ namespace miModul
 
 	class IOModulBase : public IOModulInterface
 	{
-	protected:
+	private:
 		std::string _Name;
 		IOModulResult _State;
+		rapidjson::Document _ModuleDescription;
 		
-
-
-
 	public:
 		IOModulBase()
-			:_State(IOModulResult::Ok)
+			: _Name("Modul")
+			,_State(IOModulResult::Ok)
 		{
 			
 		};
-
+		const IOModulResult State() const
+		{
+			return _State;
+		}
+		virtual ~IOModulBase() = 0;
 		virtual IOModulResult Init() = 0;
-		
 		virtual IOModulResult Deinit() = 0;
-		
-
-
+	
 	};
-	
-	IOModulInterface* create();
-		
-	
 }
 

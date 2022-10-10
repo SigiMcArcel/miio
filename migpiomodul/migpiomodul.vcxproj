@@ -95,6 +95,9 @@
     <ClCompile Include="..\miiomodule\IOModulBase.cpp" />
     <ClCompile Include="GPIOModul.cpp" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="config.json" />
+  </ItemGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">
     <ClCompile>
       <AdditionalIncludeDirectories>..\..\common\;..\..\Drivers\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>

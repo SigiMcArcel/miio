@@ -5,319 +5,320 @@
 			"items": [{
 					"id": 0,
 					"direction": "in",
-					"offset": 0
-					"bitsize": 1,
+					"bitoffset": 0,
+					"bitsize": 1
 				},
 				{
 					"id": 1,
 					"direction": "in",
-					"offset": 1
-					"bitsize": 1,
+					"bitoffset": 1,
+					"bitsize": 1
 				},
 				{
 					"id": 2,
 					"direction": "in",
-					"offset": 2
-					"bitsize": 1,
+					"bitoffset": 2,
+					"bitsize": 1
 				},
 				{
 					"id": 3,
 					"direction": "in",
-					"offset": 3
-					"bitsize": 1,
+					"bitoffset": 3,
+					"bitsize": 1
 				},
 				{
 					"id": 4,
 					"direction": "in",
-					"offset": 4
-					"bitsize": 1,
+					"bitoffset": 4,
+					"bitsize": 1
 				},
 				{
 					"id": 5,
 					"direction": "in",
-					"offset": 5
-					"bitsize": 1,
+					"bitoffset": 5,
+					"bitsize": 1
 				},
 				{
 					"id": 6,
 					"direction": "in",
-					"offset": 6
-					"bitsize": 1,
+					"bitoffset": 6,
+					"bitsize": 1
 				},
 				{
 					"id": 7,
 					"direction": "in",
-					"offset": 7
-					"bitsize": 1,
+					"bitoffset": 7,
+					"bitsize": 1
 				},
 				{
 					"id": 8,
 					"direction": "in",
-					"offset": 8
-					"bitsize": 8,
+					"bitoffset": 8,
+					"bitsize": 8
 				},
 				{
 					"id": 9,
 					"direction": "in",
-					"offset": 16
-					"bitsize": 16,
+					"bitoffset": 16,
+					"bitsize": 16
 				},
 				{
 					"id": 10,
 					"direction": "in",
-					"offset": 32
-					"bitsize": 32,
+					"bitoffset": 32,
+					"bitsize": 32
 				},
 				{
 					"id": 11,
 					"direction": "in",
-					"offset": 64
-					"bitsize": 32,
+					"bitoffset": 64,
+					"bitsize": 32
 				},
 				{
 					"id": 12,
 					"direction": "out",
-					"offset": 0
-					"bitsize": 1,
+					"bitoffset": 0,
+					"bitsize": 1
 				},
 				{
 					"id": 13,
 					"direction": "out",
-					"offset": 1
-					"bitsize": 1,
+					"bitoffset": 1,
+					"bitsize": 1
 				},
 				{
 					"id": 14,
 					"direction": "out",
-					"offset": 2
-					"bitsize": 1,
+					"bitoffset": 2,
+					"bitsize": 1
 				},
 				{
 					"id": 15,
 					"direction": "out",
-					"offset": 3
-					"bitsize": 1,
+					"bitoffset": 3,
+					"bitsize": 1
 				},
 				{
 					"id": 16,
 					"direction": "out",
-					"offset": 4
-					"bitsize": 1,
+					"bitoffset": 4,
+					"bitsize": 1
 				},
 				{
 					"id": 17,
 					"direction": "out",
-					"offset": 5
-					"bitsize": 1,
+					"bitoffset": 5,
+					"bitsize": 1
 				},
 				{
 					"id": 18,
 					"direction": "out",
-					"offset": 6
-					"bitsize": 1,
+					"bitoffset": 6,
+					"bitsize": 1
 				},
 				{
 					"id": 19,
 					"direction": "out",
-					"offset": 7
-					"bitsize": 1,
+					"bitoffset": 7,
+					"bitsize": 1
 				},
 				{
 					"id": 20,
 					"direction": "out",
-					"offset": 8
-					"bitsize": 8,
+					"bitoffset": 8,
+					"bitsize": 8
 				},
 				{
 					"id": 21,
 					"direction": "out",
-					"offset": 16
-					"bitsize": 16,
+					"bitoffset": 16,
+					"bitsize": 16
 				},
 				{
 					"id": 22,
 					"direction": "out",
-					"offset": 32
-					"bitsize": 32,
+					"bitoffset": 32,
+					"bitsize": 32
 				},
 				{
 					"id": 23,
 					"direction": "out",
-					"offset": 64
-					"bitsize": 32,
-				},
+					"bitoffset": 64,
+					"bitsize": 32
+				}
 			]
 		},
-		"imaps": [{
-			"name": "bit0",
-			"id": 0,
-			"offset": 0,
-			"bitsize": 1,
-			"driverspecific": 1
-		},
-		{
-			"name": "bit1",
-			"id": 1,
-			"offset": 2,
-			"bitsize": 1,
-			"driverspecific": 1
-		},
-		{
-			"name": "bit2",
-			"id": 2,
-			"offset": 2,
-			"bitsize": 1,
-			"driverspecific": 1
-		},
-		{
-			"name": "bit3",
-			"id": 3,
-			"offset": 3,
-			"bitsize": 1,
-			"driverspecific": 1
-		},
-		{
-			"name": "bit4",
-			"id": 4,
-			"offset": 4,
-			"bitsize": 1,
-			"driverspecific": 1
-		},
-		{
-			"name": "bit5",
-			"id": 5,
-			"offset": 5,
-			"bitsize": 1,
-			"driverspecific": 1
-		},
-		{
-			"name": "bit6",
-			"id": 6,
-			"offset": 6,
-			"bitsize": 1,
-			"driverspecific": 1
-		},
-		{
-			"name": "bit7",
-			"id": 7,
-			"offset": 7,
-			"bitsize": 1,
-			"driverspecific": 1
-		},
-		{
-			"name": "Byte",
-			"id": 8,
-			"offset": 8,
-			"bitsize": 8,
-			"driverspecific": 1
-		},
-		{
-			"name": "Short",
-			"id": 9,
-			"offset": 16,
-			"bitsize": 16,
-			"driverspecific": 1
-		},
-		{
-			"name": "UI32",
-			"id": 10,
-			"offset": 32,
-			"bitsize": 32,
-			"driverspecific": 1
-		},
-		{
-			"name": "Real",
-			"id": 11,
-			"offset": 64,
-			"bitsize": 32,
-			"driverspecific": 1
-		},
-		
+		"imaps": [
+			{
+				"name": "bit0",
+				"id": 0,
+				"bitoffset": 0,
+				"bitsize": 1,
+				"driverspecific": 1
+			},
+			{
+				"name": "bit1",
+				"id": 1,
+				"bitoffset": 2,
+				"bitsize": 1,
+				"driverspecific": 1
+			},
+			{
+				"name": "bit2",
+				"id": 2,
+				"bitoffset": 2,
+				"bitsize": 1,
+				"driverspecific": 1
+			},
+			{
+				"name": "bit3",
+				"id": 3,
+				"bitoffset": 3,
+				"bitsize": 1,
+				"driverspecific": 1
+			},
+			{
+				"name": "bit4",
+				"id": 4,
+				"bitoffset": 4,
+				"bitsize": 1,
+				"driverspecific": 1
+			},
+			{
+				"name": "bit5",
+				"id": 5,
+				"bitoffset": 5,
+				"bitsize": 1,
+				"driverspecific": 1
+			},
+			{
+				"name": "bit6",
+				"id": 6,
+				"bitoffset": 6,
+				"bitsize": 1,
+				"driverspecific": 1
+			},
+			{
+				"name": "bit7",
+				"id": 7,
+				"bitoffset": 7,
+				"bitsize": 1,
+				"driverspecific": 1
+			},
+			{
+				"name": "Byte",
+				"id": 8,
+				"bitoffset": 8,
+				"bitsize": 8,
+				"driverspecific": 1
+			},
+			{
+				"name": "Short",
+				"id": 9,
+				"bitoffset": 16,
+				"bitsize": 16,
+				"driverspecific": 1
+			},
+			{
+				"name": "UI32",
+				"id": 10,
+				"bitoffset": 32,
+				"bitsize": 32,
+				"driverspecific": 1
+			},
+			{
+				"name": "Real",
+				"id": 11,
+				"bitoffset": 64,
+				"bitsize": 32,
+				"driverspecific": 1
+			}
 		],
-		"omaps": [{
-			"name": "bit0",
-			"id": 0,
-			"offset": 0,
-			"bitsize": 1,
-			"driverspecific": 1
-		},
-		{
-			"name": "bit1",
-			"id": 1,
-			"offset": 2,
-			"bitsize": 1,
-			"driverspecific": 1
-		},
-		{
-			"name": "bit2",
-			"id": 2,
-			"offset": 2,
-			"bitsize": 1,
-			"driverspecific": 1
-		},
-		{
-			"name": "bit3",
-			"id": 3,
-			"offset": 3,
-			"bitsize": 1,
-			"driverspecific": 1
-		},
-		{
-			"name": "bit4",
-			"id": 4,
-			"offset": 4,
-			"bitsize": 1,
-			"driverspecific": 1
-		},
-		{
-			"name": "bit5",
-			"id": 5,
-			"offset": 5,
-			"bitsize": 1,
-			"driverspecific": 1
-		},
-		{
-			"name": "bit6",
-			"id": 6,
-			"offset": 6,
-			"bitsize": 1,
-			"driverspecific": 1
-		},
-		{
-			"name": "bit7",
-			"id": 7,
-			"offset": 7,
-			"bitsize": 1,
-			"driverspecific": 1
-		},
-		{
-			"name": "Byte",
-			"id": 8,
-			"offset": 8,
-			"bitsize": 8,
-			"driverspecific": 1
-		},
-		{
-			"name": "Short",
-			"id": 9,
-			"offset": 16,
-			"bitsize": 16,
-			"driverspecific": 1
-		},
-		{
-			"name": "UI32",
-			"id": 10,
-			"offset": 32,
-			"bitsize": 32,
-			"driverspecific": 1
-		},
-		{
-			"name": "Real",
-			"id": 11,
-			"offset": 64,
-			"bitsize": 32,
-			"driverspecific": 1
-		},
+		"omaps": [
+			{
+				"name": "bit0",
+				"id": 0,
+				"bitoffset": 0,
+				"bitsize": 1,
+				"driverspecific": 1
+			},
+			{
+				"name": "bit1",
+				"id": 1,
+				"bitoffset": 2,
+				"bitsize": 1,
+				"driverspecific": 1
+			},
+			{
+				"name": "bit2",
+				"id": 2,
+				"bitoffset": 2,
+				"bitsize": 1,
+				"driverspecific": 1
+			},
+			{
+				"name": "bit3",
+				"id": 3,
+				"bitoffset": 3,
+				"bitsize": 1,
+				"driverspecific": 1
+			},
+			{
+				"name": "bit4",
+				"id": 4,
+				"bitoffset": 4,
+				"bitsize": 1,
+				"driverspecific": 1
+			},
+			{
+				"name": "bit5",
+				"id": 5,
+				"bitoffset": 5,
+				"bitsize": 1,
+				"driverspecific": 1
+			},
+			{
+				"name": "bit6",
+				"id": 6,
+				"bitoffset": 6,
+				"bitsize": 1,
+				"driverspecific": 1
+			},
+			{
+				"name": "bit7",
+				"id": 7,
+				"bitoffset": 7,
+				"bitsize": 1,
+				"driverspecific": 1
+			},
+			{
+				"name": "Byte",
+				"id": 8,
+				"bitoffset": 8,
+				"bitsize": 8,
+				"driverspecific": 1
+			},
+			{
+				"name": "Short",
+				"id": 9,
+				"bitoffset": 16,
+				"bitsize": 16,
+				"driverspecific": 1
+			},
+			{
+				"name": "UI32",
+				"id": 10,
+				"bitoffset": 32,
+				"bitsize": 32,
+				"driverspecific": 1
+			},
+			{
+				"name": "Real",
+				"id": 11,
+				"bitoffset": 64,
+				"bitsize": 32,
+				"driverspecific": 1
+			}
 		]
 	}
 }

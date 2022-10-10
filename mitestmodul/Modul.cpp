@@ -16,6 +16,10 @@ Modul::Modul()
 	
 }
 
+miModul::Modul::~Modul()
+{
+}
+
 IOModulResult miModul::Modul::Init()
 {
 	
@@ -31,7 +35,7 @@ IOModulResult miModul::Modul::Deinit()
 }
 
 
-IOModulResult Modul::open(const std::string& configuration)
+IOModulResult Modul::Open(const std::string& configuration)
 {
 	rapidjson::Document d;
 	d.Parse(configuration.c_str());
@@ -43,9 +47,15 @@ IOModulResult Modul::open(const std::string& configuration)
 
 	if (!mimoduldescription.HasMember("name"))
 	{
-		return  IOModulResult::ErrorConf;
+		_State = IOModulResult::ErrorConf;
+		return _State;
 	}
 	const rapidjson::Value& name = mimoduldescription["name"];
+	if (std::string(name.GetString()) != _Name)
+	{
+		_State = IOModulResult::ErrorDescriptionNotMatch;
+		return _State;
+	}
 
 	if (!mimoduldescription.HasMember("modulconf"))
 	{
@@ -65,10 +75,11 @@ IOModulResult Modul::open(const std::string& configuration)
 
 	for (rapidjson::SizeType i = 0; i < items.Size(); i++)
 	{
-		Direction dir;
+		ModulDirection dir;
 		int32_t id = 0;
-		int32_t offset = 0;
-		int32_t bitsize = 0;
+		int32_t bitOffset = 0;
+		int32_t bitSize = 0;
+		int32_t pinNumber = 0;
 		const rapidjson::Value& pin = items[i];
 
 		if (!pin.HasMember("id"))
@@ -77,11 +88,17 @@ IOModulResult Modul::open(const std::string& configuration)
 		}
 		id = pin["id"].GetInt();
 
-		if (!pin.HasMember("offset"))
+		if (!pin.HasMember("bitoffset"))
 		{
 			return IOModulResult::ErrorConf;
 		}
-		offset = pin["offset"].GetInt();
+		bitOffset = pin["bitoffset"].GetInt();
+
+		if (!pin.HasMember("bitsize"))
+		{
+			return IOModulResult::ErrorConf;
+		}
+		bitSize = pin["bitsize"].GetInt();
 
 		if (!pin.HasMember("direction"))
 		{
@@ -89,38 +106,40 @@ IOModulResult Modul::open(const std::string& configuration)
 		}
 		if (std::string(pin["direction"].GetString()) == std::string("in"))
 		{
-			dir = Direction::In;
+			dir = ModulDirection::In;
 		}
 		else
 		if (std::string(pin["direction"].GetString()) == std::string("out"))
 		{
-			dir = Direction::In;
+			dir = ModulDirection::Out;
 		}
 		else
 		{
 			return IOModulResult::ErrorConf;
 		}
+		ModulConfig conf = ModulConfig(dir, id, pinNumber, bitOffset, bitSize);
+		_ModulConfig[id] = conf;
 		
 	}
 	return Init();
 }
 
-IOModulResult miModul::Modul::start()
+IOModulResult miModul::Modul::Start()
 {
 	return IOModulResult::ErrorNotImplemented;
 }
 
-IOModulResult miModul::Modul::stop()
+IOModulResult miModul::Modul::Stop()
 {
 	return IOModulResult::ErrorNotImplemented;
 }
 
-IOModulResult miModul::Modul::close()
+IOModulResult miModul::Modul::Close()
 {
 	return Deinit();
 }
 
-IOModulResult miModul::Modul::readInputs(const miIOImage::IOImage& image, const IOModulIOMap& map)
+IOModulResult miModul::Modul::ReadInputs(const miIOImage::IOImage& image, const IOModulIOMap& map)
 {
 	bool val = false;
 	miIOImage::IOImageResult imageResult  = miIOImage::IOImageResult::Ok;
@@ -149,11 +168,11 @@ IOModulResult miModul::Modul::readInputs(const miIOImage::IOImage& image, const 
 	return IOModulResult::Ok;
 }
 
-IOModulResult miModul::Modul::writeOutputs(const miIOImage::IOImage& image, const IOModulIOMap& map)
+IOModulResult miModul::Modul::WriteOutputs(const miIOImage::IOImage& image, const IOModulIOMap& map)
 {
 	bool val = false;
 	int byteOffset = map.Offset() / 8;
-	int bitOfset = map.Offset() % 8;
+	int bitOffset = map.Offset() % 8;
 	miIOImage::IOImageResult imageResult = miIOImage::IOImageResult::Ok;
 
 	if (map.Size() == 1)
@@ -161,11 +180,11 @@ IOModulResult miModul::Modul::writeOutputs(const miIOImage::IOImage& image, cons
 		val = image.ReadBit(map.Offset(), imageResult);
 		if (val)
 		{
-			data[byteOffset] |= (1 << bitOfset);
+			data[byteOffset] |= static_cast<uint8_t>(1 << bitOffset);
 		}
 		else
 		{
-			data[byteOffset] &= ~(1 << bitOfset);
+			data[byteOffset] &= static_cast<uint8_t>(~(1 << bitOffset));
 		}
 	}
 	else
@@ -179,7 +198,7 @@ IOModulResult miModul::Modul::writeOutputs(const miIOImage::IOImage& image, cons
 	return IOModulResult::Ok;
 }
 
-IOModulResult miModul::Modul::control(const std::string name, const std::string function, uint32_t parameter)
+IOModulResult miModul::Modul::Control(const std::string name, const std::string function, uint32_t parameter)
 {
 	return IOModulResult::ErrorNotImplemented;
 }
@@ -193,6 +212,8 @@ extern "C"
 	}
 	void destroy(IOModulInterface* obj)
 	{
-		delete obj;
+		Modul* delObj = reinterpret_cast<Modul*>(obj);
+		delete delObj;
+		delObj = nullptr;
 	}
 }

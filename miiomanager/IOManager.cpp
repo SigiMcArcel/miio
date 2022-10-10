@@ -96,7 +96,7 @@ IOManagerResult miIOManager::IOManager::ReadConfig(const std::string& configurat
         iMaps,
         oMaps);
 
-    if (desc.Interface().get()->open(configuration) != miModul::IOModulResult::Ok)
+    if (desc.Interface().get()->Open(configuration) != miModul::IOModulResult::Ok)
     {
         return IOManagerResult::ErrorLoadDriver;
     }
@@ -193,7 +193,7 @@ IOManagerResult miIOManager::IOManager::IOModulControl(const std::string& name, 
     {
         return IOManagerResult::ErrorModulNotFound;
     }
-    if (_ModulList[name].Interface().get()->control(name, function, parameter) != miModul::IOModulResult::ErrorControl)
+    if (_ModulList[name].Interface().get()->Control(name, function, parameter) != miModul::IOModulResult::ErrorControl)
     {
         return IOManagerResult::ErrorModulCtrl;
     }
@@ -214,12 +214,12 @@ void miIOManager::IOManager::eventOccured(void* sender, const std::string& name)
         }
         for (const auto& m : n.second.IMap())
         {
-            n.second.Interface().get()->readInputs(_InputImage, m.second);
+            n.second.Interface().get()->ReadInputs(_InputImage, m.second);
            
         }
         for (const auto& m : n.second.OMap())
         {
-            n.second.Interface().get()->writeOutputs(_OutputImage, m.second);
+            n.second.Interface().get()->WriteOutputs(_OutputImage, m.second);
         }
     }
 }

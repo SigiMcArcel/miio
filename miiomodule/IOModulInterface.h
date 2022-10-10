@@ -14,7 +14,8 @@ namespace miModul
 		ErrorConf,
 		ErrorControl,
 		ErrorNotConfigured,
-		ErrorNotImplemented
+		ErrorNotImplemented,
+		ErrorDescriptionNotMatch
 	}IOModulResult;
 
 	class IOModulIOMap
@@ -43,13 +44,13 @@ namespace miModul
 	class IOModulInterface
 	{
 	public:
-		virtual IOModulResult open(const std::string& configuration) = 0;
-		virtual IOModulResult start() = 0;
-		virtual IOModulResult stop() = 0;
-		virtual IOModulResult close() = 0;
-		virtual IOModulResult readInputs(const miIOImage::IOImage& image, const IOModulIOMap& map) = 0;
-		virtual IOModulResult writeOutputs(const miIOImage::IOImage& image, const IOModulIOMap& map) = 0;
-		virtual IOModulResult control(const std::string name, const std::string function, uint32_t parameter) = 0;
+		virtual IOModulResult Open(const std::string& configuration) = 0;
+		virtual IOModulResult Start() = 0;
+		virtual IOModulResult Stop() = 0;
+		virtual IOModulResult Close() = 0;
+		virtual IOModulResult ReadInputs(const miIOImage::IOImage& image, const IOModulIOMap& map) = 0;
+		virtual IOModulResult WriteOutputs(const miIOImage::IOImage& image, const IOModulIOMap& map) = 0;
+		virtual IOModulResult Control(const std::string name, const std::string function, uint32_t parameter) = 0;
 	};
 }
 

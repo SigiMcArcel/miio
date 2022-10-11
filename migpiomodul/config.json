@@ -1,0 +1,58 @@
+{
+	"mimoduldescription": {
+		"name": "migpioModul",
+		"modulconf": {
+			"gpiopins": [{
+					"id": 0,
+					"direction": "in",
+					"number": 24
+				},
+				{
+					"id": 1,
+					"direction": "in",
+					"number": 13
+				},
+				{
+					"id": 2,
+					"direction": "out",
+					"number": 2
+				},
+				{
+					"id": 3,
+					"direction": "out",
+					"number": 4
+				}
+			]
+		},
+		"imaps": [{
+			"name": "gpioin1",
+			"id": 0,
+			"offset": 0,
+			"bitsize": 1,
+			"driverspecific": 1
+		},
+		{
+			"name": "gpioin2",
+			"id": 1,
+			"offset": 1,
+			"bitsize": 1,
+			"driverspecific": 2
+		}
+		],
+		"omaps": [{
+			"name": "gpioout1",
+			"id": 2,
+			"offset": 0,
+			"bitsize": 1,
+			"driverspecific": 3
+		},
+		{
+			"name": "gpioout2",
+			"id": 3,
+			"offset": 1,
+			"bitsize": 1,
+			"driverspecific": 4
+		}
+		]
+	}
+}

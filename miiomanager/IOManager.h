@@ -11,62 +11,6 @@
 #include <mi/miio/IOImage.h>
 #include "mi/miio/IOModulInterface.h"
 
-
-/*
-* Modul description format (json)
-* 
-* mimoduldescription
-* {
-*		name:"gpiomodul"
-*       modulconf:
-*		{
-*			configuration:
-*			{
-*				(*driver specific*)
-*				gpiopins:
-*				{
-*					pin:
-*					{
-*						id:0,
-*						direction:in,
-*						number:24
-*					{
-*					pin:
-*					{
-*						id:1,
-*						direction:out,
-*						number:18
-*					{
-*				{
-* 
-*			}
-*			imaps:
-*			{
-*				map:
-*				{
-*					name: "gpioin1",
-*					id:0,
-*					offset:0,
-*					bitsize:1,
-*					driverspecific:0,
-*				}
-*			}
-*			omaps:
-*			{
-*				map:
-*				{
-*					name: "gpioout1",
-* *					id:1,
-*					offset:0,
-*					bitsize:1,
-*					driverspecific:1
-*				}
-*			}
-*		}
-* }
-* 
-* 
-*/
 namespace miIOManager
 {
 
@@ -82,11 +26,18 @@ namespace miIOManager
 		ErrorModulCtrl,
 		ErrorModulWrite,
 		ErrorModulRead,
-		ErrorConfiguration
+		ErrorConfiguration,
+		ErrorModulStart
 }IOManagerResult;
 
 typedef std::shared_ptr<miModul::IOModulInterface> IOModulInterface_p;
-typedef std::map<int32_t, miModul::IOModulIOMap> IOMap;
+typedef std::map<int32_t, miModul::IOModulIOMap> IOMapMap;
+
+typedef struct IOMap_t
+{
+	IOMapMap iOMapMap;
+	miIOImage::IOImageSize _BitSize;
+}IOMap;
 
 class IOModulDescription
 {
@@ -112,7 +63,6 @@ public:
 		,_Interface(modulInterface)
 		,_IMap(iMap)
 		,_OMap(oMap)
-		
 	{
 
 	}
@@ -131,21 +81,27 @@ private:
 	miIOImage::IOImage _OutputImage;
 	std::map<std::string,IOModulDescription> _ModulList;
 	miutils::Timer _Timer;
+	miIOImage::IOImageOffset _ActInputOffset;
+	miIOImage::IOImageOffset _ActOutputOffset;
+	IOManagerResult _State;
 
 	IOModulInterface_p LoadModul(const std::string& libraryName,IOManagerResult& result);
 	IOManagerResult UnLoadModul(const std::string& libraryName, const IOModulInterface_p& obj);
-	IOManagerResult ReadConfig(const std::string& configuration);
-	IOManagerResult ReadIOMaps(const rapidjson::Value& d, std::string key, IOMap& iomap);
-
-
+	IOManagerResult ReadConfig(const std::string& configuration, miIOImage::IOImageOffset startInputOffset, miIOImage::IOImageOffset startOutputOffset);
+	IOManagerResult ReadIOMaps(const rapidjson::Value& d, std::string key, IOMap& iomap,const miIOImage::IOImageOffset startOffset);
 
 public:
 	IOManager(miIOImage::IOImageSize inputImageSize, miIOImage::IOImageSize outputImageSize);
 		
 	IOManagerResult AddIOModul(const std::string& configuration);
+	IOManagerResult AddIOModul(const miIOImage::IOImageOffset inputOffset, const miIOImage::IOImageOffset outputOffset, const std::string& configuration);
 	IOManagerResult RemoveIOModul(const std::string& name);
+	IOManagerResult ReadInputs();
+	IOManagerResult WriteOutputs();
 	IOManagerResult StartIOCycle(int cycleTime);
 	IOManagerResult StopIOCycle();
+	IOManagerResult StartIOModulCycle();
+	IOManagerResult StopIOModulCycle();
 	IOManagerResult IOModulControl(const std::string& name,const std::string function,uint32_t parameter);
 
 	const miIOImage::IOImage& OutputImage() const
@@ -156,6 +112,11 @@ public:
 	const miIOImage::IOImage& InputImage() const
 	{
 		return _InputImage;
+	}
+
+	const IOManagerResult State() const
+	{
+		return _State;
 	}
 	
 		

@@ -94,7 +94,6 @@ namespace miIOImage
 		const IOImageSize IOImageByteSize() const;
 		bool Valid() const;
 		const IOImagePointer Memory() const;
-		const IOImageSize InvalidValueBitOffset() const;
 		const IOImageResult State() const;
 
 		//functions

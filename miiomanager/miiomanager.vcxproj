@@ -105,7 +105,7 @@
       <LibraryDependencies>miutils;miioimage</LibraryDependencies>
     </Link>
     <RemotePostBuildEvent>
-      <Command>cp $(RemoteDebuggerCommand) /usr/lib &amp;&amp; cp $(RemoteDeployDir)/miiomanager/IOManager.h /usr/include/mi/miio</Command>
+      <Command>cp $(RemoteTargetPath) /usr/lib &amp;&amp; cp $(RemoteDeployDir)/miiomanager/IOManager.h /usr/include/mi/miio</Command>
     </RemotePostBuildEvent>
     <RemotePreBuildEvent>
       <Command>cp $(RemoteDeployDir)/miiomodule/IOModulInterface.h /usr/include/mi/miio</Command>

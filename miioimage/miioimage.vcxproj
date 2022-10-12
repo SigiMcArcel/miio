@@ -104,6 +104,11 @@
     <RemotePostBuildEvent>
       <Command>cp $(RemoteDebuggerCommand) /usr/lib &amp;&amp; cp $(RemoteDeployDir)/IOImage.h /usr/include/mi/miio</Command>
     </RemotePostBuildEvent>
+    <Link>
+      <ForceUndefineSymbolReferences>
+      </ForceUndefineSymbolReferences>
+      <LibraryDependencies>miutils</LibraryDependencies>
+    </Link>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets" />

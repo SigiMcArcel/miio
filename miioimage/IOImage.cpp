@@ -19,6 +19,7 @@ IOImage::IOImage(IOImageSize size,IOImageType type, std::string name)
 	, _IOImageByteSize(size)
 	, _IOImageType(type)
 	,_Name(name)
+	, _Criticalsection(new std::mutex)
 {
 	
 	if (Alloc() == IOImageResult::Ok)
@@ -33,6 +34,7 @@ IOImage::IOImage(const IOImage& other)
 	, _IOImageMem(other._IOImageMem)
 	, _IOImageByteSize(other._IOImageByteSize)
 	, _IOImageType(other._IOImageType)
+	, _Criticalsection(other._Criticalsection)
 {
 	_InstanceCounter++;
 	printf("copy constructor instance = %d  from %s\n", _InstanceCounter, other._Name.c_str());
@@ -49,6 +51,7 @@ IOImage::~IOImage()
 		delete _IOImageMem;
 		_IOImageMem = nullptr;
 		_InstanceCounter = 0;
+		delete _Criticalsection;
 	}
 	if (_InstanceCounter < 0)
 	{
@@ -65,6 +68,7 @@ const IOImage& miIOImage::IOImage::operator=(const IOImage& other)
 	_IOImageMem = other._IOImageMem;
 	_IOImageByteSize = other._IOImageByteSize;
 	_IOImageType = other._IOImageType;
+	_Criticalsection = other._Criticalsection;
 	printf("assigne instance = %d from %s\n", _InstanceCounter,other._Name.c_str());
 	return *this;
 }
@@ -107,6 +111,7 @@ IOImageResult miIOImage::IOImage::Alloc()
 
 IOImageResult IOImage::CopyTo(IOImageSize byteOffset, const IOImage& destination, const IOImageSize destinationByteOffset, IOImageSize size) const
 {
+	
 	if (!_Valid)
 	{
 		return IOImageResult::InvalidMemory;
@@ -135,7 +140,9 @@ IOImageResult IOImage::CopyTo(IOImageSize byteOffset, const IOImage& destination
 	{
 		return IOImageResult::InvalidMemory;
 	}
+	_Criticalsection->lock();
 	std::memcpy(destination.Memory() + destinationByteOffset, _IOImageMem + byteOffset, size);
+	_Criticalsection->unlock();
 	return IOImageResult::Ok;
 }
 
@@ -165,7 +172,9 @@ IOImageResult miIOImage::IOImage::CopyFrom(IOImageSize byteOffset, const IOImage
 	{
 		return IOImageResult::ErrorRangeExceeded;
 	}
+	_Criticalsection->lock();
 	std::memcpy(_IOImageMem + byteOffset,source.Memory() + sourceByteOffset,size);
+	_Criticalsection->unlock();
 	return IOImageResult::Ok;
 
 }
@@ -188,7 +197,9 @@ IOImageResult miIOImage::IOImage::Write(IOImageSize byteOffset, void* data, IOIm
 	{
 		return IOImageResult::ErrorRangeExceeded;
 	}
+	_Criticalsection->lock();
 	std::memcpy(_IOImageMem + byteOffset, data , size);
+	_Criticalsection->unlock();
 	return IOImageResult::Ok;
 }
 
@@ -210,7 +221,9 @@ IOImageResult miIOImage::IOImage::Read(IOImageSize byteOffset, void* data, IOIma
 	{
 		return IOImageResult::ErrorRangeExceeded;
 	}
+	_Criticalsection->lock();
 	std::memcpy(data, _IOImageMem + byteOffset, size);
+	_Criticalsection->unlock();
 	return IOImageResult::Ok;
 }
 

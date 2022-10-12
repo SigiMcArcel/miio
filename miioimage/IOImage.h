@@ -6,6 +6,9 @@
 #include <array>
 #include <type_traits>
 #include <memory>
+#include <thread>
+#include <mutex>
+#include <mi/miutils/CriticalSection.h>
 
 /// <summary>
 /// Interface for machina imaginis control
@@ -80,6 +83,7 @@ namespace miIOImage
 		IOImageType _IOImageType;
 		IOImageResult _State;
 		std::string _Name;
+		std::mutex* _Criticalsection;
 
 		IOImageResult Alloc();
 		

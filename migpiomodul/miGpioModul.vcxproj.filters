@@ -21,7 +21,7 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <None Include="config.json">
+    <None Include="migpiomodul.json">
       <Filter>Description</Filter>
     </None>
   </ItemGroup>

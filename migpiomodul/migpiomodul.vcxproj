@@ -96,7 +96,7 @@
     <ClCompile Include="GPIOModul.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="config.json" />
+    <None Include="migpiomodul.json" />
   </ItemGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">
     <ClCompile>

@@ -11,7 +11,7 @@ using namespace miModul;
 miModul::GPIOModul::GPIOModul()
 	:IOModulBase()
 {
-	_Name = std::string("GPIOModul");
+	_Name = std::string("migpiomodul");
 }
 
 miModul::GPIOModul::~GPIOModul()
@@ -44,8 +44,6 @@ IOModulResult miModul::GPIOModul::Init()
 	return _State;
 }
 
-
-
 IOModulResult miModul::GPIOModul::Deinit()
 {
 	for (const auto& n : _PinConfiguration)
@@ -54,7 +52,6 @@ IOModulResult miModul::GPIOModul::Deinit()
 	}
 	return IOModulResult::Ok;
 }
-
 
 IOModulResult GPIOModul::Open(const std::string& configuration)
 {
@@ -139,7 +136,9 @@ IOModulResult GPIOModul::Open(const std::string& configuration)
 		}
 		GPIOPinConfig conf = GPIOPinConfig(dir, id, pinNumber);
 		_PinConfiguration[id] = conf;
+		
 	}
+	Init();
 	return IOModulResult::Ok;
 }
 

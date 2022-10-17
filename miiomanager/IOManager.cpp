@@ -1,5 +1,8 @@
 #include <dlfcn.h>
 #include "IOManager.h"
+#include <fstream>
+#include <iostream>
+#include <sstream> //std::stringstream
 
 using namespace miIOManager;
 
@@ -11,12 +14,14 @@ IOModulInterface_p IOManager::LoadModul(const std::string& libraryName, IOManage
 
     if (nullptr == dynamicHandle)
     {
+        printf("could not load iomodul %s\n", libraryName.c_str());
         result = IOManagerResult::ErrorLoadDriver;
         return IOModulInterface_p();
     }
-    void* interface = dlsym(dynamicHandle, "create");
+    void* interface = dlsym(dynamicHandle, IOModulCreationFunctionName.c_str());
     if (interface == nullptr)
     {
+        printf("could not load iomodul entry %s\n", libraryName.c_str());
         result = IOManagerResult::ErrorLoadDriver;
         return IOModulInterface_p();
     }
@@ -24,6 +29,13 @@ IOModulInterface_p IOManager::LoadModul(const std::string& libraryName, IOManage
     miModul::IOModulInterface* tp = create();
     if (tp == nullptr)
     {
+        printf("could not load iomodul interface %s\n", libraryName.c_str());
+        result = IOManagerResult::ErrorLoadDriver;
+        return IOModulInterface_p();
+    }
+    if (miModul::_IOMODULVERSION_ != tp->Version())
+    {
+        printf("interface Version not match %s <-> %s form library %s\n", miModul::_IOMODULVERSION_.c_str(), tp->Version().c_str(), libraryName.c_str());
         result = IOManagerResult::ErrorLoadDriver;
         return IOModulInterface_p();
     }
@@ -40,7 +52,7 @@ IOManagerResult IOManager::UnLoadModul(const std::string& libraryName, const IOM
     {
         return IOManagerResult::ErrorLoadDriver;
     }
-    void* interface = dlsym(dynamicHandle, "destroy");
+    void* interface = dlsym(dynamicHandle, IOModulDestroyFunctionName.c_str());
     if (interface == nullptr)
     {
         return IOManagerResult::ErrorLoadDriver;
@@ -50,14 +62,26 @@ IOManagerResult IOManager::UnLoadModul(const std::string& libraryName, const IOM
     return IOManagerResult::Ok;
 }
 
-IOManagerResult miIOManager::IOManager::ReadConfig(const std::string& configuration, miIOImage::IOImageOffset startInputOffset, miIOImage::IOImageOffset startOutputOffset)
+IOManagerResult miIOManager::IOManager::ReadConfig(const std::string& name, miIOImage::IOImageOffset startInputOffset, miIOImage::IOImageOffset startOutputOffset, const std::string& driverspecific)
 {
     rapidjson::Document d;
     IOManagerResult result = IOManagerResult::Ok;
     IOMap iMaps;
     IOMap oMaps;
+    std::string path = _IOModulPath + std::string("/") + name + std::string(".json");
 
-    d.Parse(configuration.c_str());
+    std::ifstream inFile;
+    std::stringstream strStream;
+    inFile.open(path.c_str()); //open the input file
+    if (!inFile.good())
+    {
+        inFile.close();
+        return IOManagerResult::ErrorModulFileNotFound;
+    }
+    strStream << inFile.rdbuf(); //read the file
+    std::string jsonString = strStream.str(); //str holds the content of the file
+
+    d.Parse(jsonString.c_str());
     if (!d.HasMember("mimoduldescription"))
     {
         return IOManagerResult::ErrorLoadDriver;
@@ -69,7 +93,7 @@ IOManagerResult miIOManager::IOManager::ReadConfig(const std::string& configurat
     {
         return IOManagerResult::ErrorConfiguration;
     }
-    const rapidjson::Value& name = mimoduldescription["name"];
+    const rapidjson::Value& jsonname = mimoduldescription["name"];
 
     result = ReadIOMaps(mimoduldescription, std::string("imaps"), iMaps, startInputOffset);
     if(result != IOManagerResult::Ok)
@@ -81,7 +105,12 @@ IOManagerResult miIOManager::IOManager::ReadConfig(const std::string& configurat
     {
         return result;
     }
-    std::string libPath = std::string("lib") + std::string(name.GetString()) + std::string(".so");
+    const rapidjson::Value& libname = mimoduldescription["libname"];
+    if (!mimoduldescription.HasMember("libname"))
+    {
+        return IOManagerResult::ErrorConfiguration;
+    }
+    std::string libPath = std::string("lib") + std::string(libname.GetString()) + std::string(".so");
     IOModulInterface_p tp = LoadModul(libPath, result);
     if (result != IOManagerResult::Ok)
     {
@@ -90,13 +119,14 @@ IOManagerResult miIOManager::IOManager::ReadConfig(const std::string& configurat
 
     IOModulDescription desc = IOModulDescription(
         std::string(libPath),
-        std::string(name.GetString()),
-        std::string(configuration),
+        std::string(jsonname.GetString()),
+        std::string(jsonString),
         tp,
         iMaps,
-        oMaps);
+        oMaps,
+        driverspecific);
 
-    if (desc.Interface().get()->Open(configuration) != miModul::IOModulResult::Ok)
+    if (desc.Interface().get()->Open(desc.Configuration(), desc.Driverspecific()) != miModul::IOModulResult::Ok)
     {
         return IOManagerResult::ErrorLoadDriver;
     }
@@ -156,18 +186,19 @@ IOManagerResult IOManager::ReadIOMaps(const rapidjson::Value& d,std::string key,
     return IOManagerResult::Ok;
 }
 
-IOManager::IOManager(miIOImage::IOImageSize inputImageSize, miIOImage::IOImageSize outputImageSize)
+IOManager::IOManager(miIOImage::IOImageSize inputImageSize, miIOImage::IOImageSize outputImageSize, const std::string& ioModulPath)
 	:_InputImage(inputImageSize, miIOImage::IOImageType::Input,"input")
 	, _OutputImage(outputImageSize, miIOImage::IOImageType::Output,"output")
     , _Timer("buscycle",this)
+    , _IOModulPath(ioModulPath)
     , _State(IOManagerResult::Ok)
 {
 
 }
 
-IOManagerResult IOManager::AddIOModul(const std::string& configuration)
+IOManagerResult IOManager::AddIOModul(const std::string& name, const std::string& driverspecific)
 {
-    IOManagerResult result =  ReadConfig(configuration, _ActInputOffset, _ActOutputOffset);
+    IOManagerResult result =  ReadConfig(name, _ActInputOffset, _ActOutputOffset,driverspecific);
     if (result != IOManagerResult::Ok)
     {
         return result;
@@ -177,9 +208,12 @@ IOManagerResult IOManager::AddIOModul(const std::string& configuration)
     return result;
 }
 
-IOManagerResult miIOManager::IOManager::AddIOModul(const miIOImage::IOImageOffset inputOffset, const miIOImage::IOImageOffset outputOffset, const std::string& configuration)
+IOManagerResult miIOManager::IOManager::AddIOModul(const miIOImage::IOImageOffset inputOffset
+    , const miIOImage::IOImageOffset outputOffset
+    , const std::string& configuration
+    , const std::string& driverspecific)
 {
-    return  ReadConfig(configuration, inputOffset,outputOffset);
+    return  ReadConfig(configuration, inputOffset,outputOffset, driverspecific);
 }
 
 IOManagerResult IOManager::RemoveIOModul(const std::string& name)
@@ -232,7 +266,8 @@ IOManagerResult miIOManager::IOManager::WriteOutputs()
 
 IOManagerResult IOManager::StartIOCycle(int cycleTime)
 {
-    if (_Timer.start(cycleTime, this, 50, miutils::Schedulers::Fifo) != miutils::TimerResults::ErrorOk)
+    return IOManagerResult::Ok;
+    if (_Timer.Start(cycleTime, this, 50, miutils::Schedulers::Fifo) != miutils::TimerResults::ErrorOk)
     {
         return IOManagerResult::ErrorStart;
     }
@@ -241,7 +276,7 @@ IOManagerResult IOManager::StartIOCycle(int cycleTime)
 
 IOManagerResult IOManager::StopIOCycle()
 {
-    _Timer.stop();
+    _Timer.Stop();
     return IOManagerResult::Ok;
 }
 

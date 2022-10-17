@@ -1,0 +1,100 @@
+{
+  "mimoduldescription": {
+    "name": "mipcf8574inmodul",
+    "libname": "mipcfmodul",
+    "modulconf": {
+      "ios": [
+        {
+          "id": 0,
+          "bit": 0,
+          "direction": "in"
+        },
+        {
+          "id": 1,
+          "bit": 1,
+          "direction": "in"
+        },
+        {
+          "id": 2,
+          "bit": 2,
+          "direction": "in"
+        },
+        {
+          "id": 3,
+          "bit": 3,
+          "direction": "in"
+        },
+        {
+          "id": 4,
+          "bit": 4,
+          "direction": "in"
+        },
+        {
+          "id": 5,
+          "bit": 5,
+          "direction": "in"
+        },
+        {
+          "id": 6,
+          "bit": 6,
+          "direction": "in"
+        },
+        {
+          "id": 7,
+          "bit": 7,
+          "direction": "in"
+        }
+      ]
+    },
+    "imaps": [
+      {
+        "name": "bit0",
+        "id": 0,
+        "bitoffset": 0,
+        "bitsize": 1"
+      },
+      {
+        "name": "bit1",
+        "id": 1,
+        "bitoffset": 2,
+        "bitsize": 1
+      },
+      {
+        "name": "bit2",
+        "id": 2,
+        "bitoffset": 2,
+        "bitsize": 1
+      },
+      {
+        "name": "bit3",
+        "id": 3,
+        "bitoffset": 3,
+        "bitsize": 1
+      },
+      {
+        "name": "bit4",
+        "id": 4,
+        "bitoffset": 4,
+        "bitsize": 1
+      },
+      {
+        "name": "bit5",
+        "id": 5,
+        "bitoffset": 5,
+        "bitsize": 1
+      },
+      {
+        "name": "bit6",
+        "id": 6,
+        "bitoffset": 6,
+        "bitsize": 1
+      },
+      {
+        "name": "bit7",
+        "id": 7,
+        "bitoffset": 7,
+        "bitsize": 1
+      }
+    ]
+  }
+}

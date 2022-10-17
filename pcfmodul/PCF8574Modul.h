@@ -1,43 +1,46 @@
 #pragma once
 #include <map>
 #include <mi/miio/IOModulBase.h>
-#include <mi/midriver/GPIODriver.h>
+#include <mi/midriver/I2CDriver.h>
 
 namespace miModul
 {
-	typedef enum GPIOPinDirection_e
+	typedef enum PCFDirection_e
 	{
 		In,
 		Out
-	}GPIOPinDirection;
-	class GPIOPinConfig
+	}PCFDirection;
+	
+	class PCFPinConfig
 	{
 	private:
-		GPIOPinDirection _Direction;
+		PCFDirection _Direction;
 		int32_t _Id;
-		int32_t _PinNumber;
+		int32_t _Bit;
 	public:
-		GPIOPinConfig() = default;
-		GPIOPinConfig(GPIOPinDirection direction,int32_t id,int32_t pinNumber)
+		PCFPinConfig() = default;
+		PCFPinConfig(PCFDirection direction, int32_t id, int32_t bit)
 			:_Direction(direction)
-			,_Id(id)
-			,_PinNumber(pinNumber)
+			, _Id(id)
+			, _Bit(bit)
 		{}
 
-		const GPIOPinDirection& Direction() const { return _Direction; };
+		const PCFDirection& Direction() const { return _Direction; };
 		const int32_t& Id() const { return _Id; };
-		const int32_t& PinNumber() const { return _PinNumber; };
+		const int32_t& Bit() const { return _Bit; };
 	};
 
-	class GPIOModul : public IOModulBase
+	class PCF8574Modul : public IOModulBase
 	{
 	private:
-		miDriver::GPIODriver _GPIODriver;
-		std::map<int32_t,GPIOPinConfig> _PinConfiguration;
+		miDriver::I2CDriver _I2CDriver;
+		std::map<int32_t, PCFPinConfig> _PinConfiguration;
+		uint8_t _Address;
 
+		IOModulResult ResolveDriverSpecific(const std::string& driverspecific);
 	public:
-		GPIOModul();
-		virtual ~GPIOModul();
+		PCF8574Modul();
+		virtual ~PCF8574Modul();
 
 		// Geerbt über IOModulBase
 		virtual IOModulResult Init();
@@ -53,7 +56,7 @@ namespace miModul
 
 		virtual IOModulResult Close() override;
 
-		virtual IOModulResult ReadInputs(const miIOImage::IOImage& image,  const IOModulIOMap& map) override;
+		virtual IOModulResult ReadInputs(const miIOImage::IOImage& image, const IOModulIOMap& map) override;
 
 		virtual IOModulResult WriteOutputs(const miIOImage::IOImage& image, const IOModulIOMap& map) override;
 

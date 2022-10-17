@@ -1,0 +1,206 @@
+{
+	"mimoduldescription": {
+		"name": "migpiomodul",
+		"libname": "migpioModul",
+		"modulconf": {
+			"gpiopins": [
+				{
+					"id": 0,
+					"direction": "in",
+					"number": 17
+				},
+				{
+					"id": 1,
+					"direction": "in",
+					"number": 27
+				},
+				{
+					"id": 2,
+					"direction": "in",
+					"number": 22
+				},
+				{
+					"id": 3,
+					"direction": "in",
+					"number": 5
+				},
+				{
+					"id": 4,
+					"direction": "in",
+					"number": 6
+				},
+				{
+					"id": 5,
+					"direction": "in",
+					"number": 13
+				},
+				{
+					"id": 6,
+					"direction": "in",
+					"number": 19
+				},
+				{
+					"id": 7,
+					"direction": "in",
+					"number": 18
+				},
+				{
+					"id": 8,
+					"direction": "out",
+					"number": 23
+				},
+				{
+					"id": 9,
+					"direction": "out",
+					"number": 24
+				},
+				{
+					"id": 10,
+					"direction": "out",
+					"number": 25
+				},
+				{
+					"id": 11,
+					"direction": "out",
+					"number": 25
+				},
+				{
+					"id": 12,
+					"direction": "out",
+					"number": 12
+				},
+				{
+					"id": 13,
+					"direction": "out",
+					"number": 16
+				},
+				{
+					"id": 14,
+					"direction": "out",
+					"number": 20
+				},
+				{
+					"id": 15,
+					"direction": "out",
+					"number": 21
+				}
+			]
+		},
+		"imaps": [
+			{
+				"name": "pinout11",
+				"id": 0,
+				"offset": 0,
+				"bitsize": 1,
+				"driverspecific": 1
+			},
+			{
+				"name": "pinout13",
+				"id": 1,
+				"offset": 1,
+				"bitsize": 1,
+				"driverspecific": 2
+			},
+			{
+				"name": "pinout15",
+				"id": 2,
+				"offset": 1,
+				"bitsize": 1,
+				"driverspecific": 2
+			},
+			{
+				"name": "pinout29",
+				"id": 3,
+				"offset": 1,
+				"bitsize": 1,
+				"driverspecific": 2
+			},
+			{
+				"name": "pinout31",
+				"id": 4,
+				"offset": 1,
+				"bitsize": 1,
+				"driverspecific": 2
+			},
+			{
+				"name": "pinout33",
+				"id": 5,
+				"offset": 1,
+				"bitsize": 1,
+				"driverspecific": 2
+			},
+			{
+				"name": "pinout35",
+				"id": 6,
+				"offset": 1,
+				"bitsize": 1,
+				"driverspecific": 2
+			},
+			{
+				"name": "pinout37",
+				"id": 7,
+				"offset": 1,
+				"bitsize": 1,
+				"driverspecific": 2
+			}
+		],
+		"omaps": [
+			{
+				"name": "pinout12",
+				"id": 8,
+				"offset": 0,
+				"bitsize": 1,
+				"driverspecific": 3
+			},
+			{
+				"name": "pinout16",
+				"id": 9,
+				"offset": 1,
+				"bitsize": 1,
+				"driverspecific": 4
+			},
+			{
+				"name": "pinout18",
+				"id": 10,
+				"offset": 1,
+				"bitsize": 1,
+				"driverspecific": 4
+			},
+			{
+				"name": "pinout22",
+				"id": 11,
+				"offset": 1,
+				"bitsize": 1,
+				"driverspecific": 4
+			},
+			{
+				"name": "pinout32",
+				"id": 12,
+				"offset": 1,
+				"bitsize": 1,
+				"driverspecific": 4
+			},
+			{
+				"name": "pinout36",
+				"id": 13,
+				"offset": 1,
+				"bitsize": 1,
+				"driverspecific": 4
+			},
+			{
+				"name": "pinout38",
+				"id": 14,
+				"offset": 1,
+				"bitsize": 1,
+				"driverspecific": 4
+			},
+			{
+				"name": "pinout40",
+				"id": 15,
+				"offset": 1,
+				"bitsize": 1,
+				"driverspecific": 4
+			}
+		]
+	}
+}

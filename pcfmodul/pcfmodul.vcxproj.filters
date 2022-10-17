@@ -1,0 +1,33 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Description">
+      <UniqueIdentifier>{e3f477c9-37aa-44a4-9ac4-0a050f1d5faf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="miiomodule">
+      <UniqueIdentifier>{e0384715-d4d4-4112-b6e6-6b076c2c2a3d}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="mipcf8574outmodul.json">
+      <Filter>Description</Filter>
+    </Text>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="mipcf8574inmodul.json">
+      <Filter>Description</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\miiomodule\IOModulBase.cpp">
+      <Filter>miiomodule</Filter>
+    </ClCompile>
+    <ClCompile Include="PCF8574Modul.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\miiomodule\IOModulBase.h">
+      <Filter>miiomodule</Filter>
+    </ClInclude>
+    <ClInclude Include="PCF8574Modul.h" />
+  </ItemGroup>
+</Project>

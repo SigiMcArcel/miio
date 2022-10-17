@@ -1,59 +1,39 @@
-#include "GPIOModul.h"
+#include "PCF8574Modul.h"
 #include <rapidjson/document.h>
 #include <rapidjson/writer.h>
 #include <rapidjson/stringbuffer.h>
 #include <string>
-
+#include <iostream>
+#include <sstream>
 
 
 using namespace miModul;
 
-miModul::GPIOModul::GPIOModul()
+miModul::PCF8574Modul::PCF8574Modul()
 	:IOModulBase()
 {
-	_Name = std::string("migpiomodul");
+	_Name = std::string("mipcf8574modul");
 }
 
-miModul::GPIOModul::~GPIOModul()
+miModul::PCF8574Modul::~PCF8574Modul()
 {
 }
 
-IOModulResult miModul::GPIOModul::Init()
+IOModulResult miModul::PCF8574Modul::Init()
 {
-	miDriver::DriverResults result = miDriver::DriverResults::Ok;
-	int32_t iDir = 0;
+	//miDriver::DriverResults result = miDriver::DriverResults::Ok;
+	//int32_t iDir = 0;
 	_State = IOModulResult::Ok;
-	for (const auto& n : _PinConfiguration)
-	{
-		result = _GPIODriver.GpioEnable(n.second.PinNumber(), true);
-		if (result != miDriver::DriverResults::Ok)
-		{
-			_State = IOModulResult::ErrorInit;
-		}
-		if (n.second.Direction() == GPIOPinDirection::In)
-		{
-			iDir = 1;
-		}
-		result = _GPIODriver.GpioSetDirection(n.second.PinNumber(), iDir);
-		if (result != miDriver::DriverResults::Ok)
-		{
-			_GPIODriver.GpioEnable(n.second.PinNumber(), false);
-			_State = IOModulResult::ErrorInit;
-		}
-	}
 	return _State;
 }
 
-IOModulResult miModul::GPIOModul::Deinit()
+IOModulResult miModul::PCF8574Modul::Deinit()
 {
-	for (const auto& n : _PinConfiguration)
-	{
-		_GPIODriver.GpioEnable(n.second.PinNumber(), false);
-	}
+	
 	return IOModulResult::Ok;
 }
 
-IOModulResult GPIOModul::Open(const std::string& configuration, const std::string& driverspecific)
+IOModulResult PCF8574Modul::Open(const std::string& configuration, const std::string& driverspecific)
 {
 	rapidjson::Document d;
 	d.Parse(configuration.c_str());
@@ -81,25 +61,26 @@ IOModulResult GPIOModul::Open(const std::string& configuration, const std::strin
 		return IOModulResult::ErrorConf;
 	}
 	const rapidjson::Value& modulconf = mimoduldescription["modulconf"];
-	
-	if (!modulconf.HasMember("gpiopins"))
-	{
-		_State = IOModulResult::ErrorConf;
-		return _State;
-	}
-	const rapidjson::Value& gpiopins = modulconf["gpiopins"];
-	if (gpiopins.Size() == 0)
-	{
-		_State = IOModulResult::ErrorConf;
-		return _State;
-	}
 
-	for (rapidjson::SizeType i = 0; i < gpiopins.Size(); i++)
+	if (!modulconf.HasMember("ios"))
 	{
-		GPIOPinDirection dir;
+		_State = IOModulResult::ErrorConf;
+		return _State;
+	}
+	const rapidjson::Value& ios = modulconf["ios"];
+	if (ios.Size() == 0)
+	{
+		_State = IOModulResult::ErrorConf;
+		return _State;
+	}
+	
+
+	for (rapidjson::SizeType i = 0; i < ios.Size(); i++)
+	{
+		PCFDirection dir;
 		int32_t id = 0;
-		int32_t pinNumber = 0;
-		const rapidjson::Value& pin = gpiopins[i];
+		int32_t bit = 0;
+		const rapidjson::Value& pin = ios[i];
 
 		if (!pin.HasMember("id"))
 		{
@@ -108,13 +89,6 @@ IOModulResult GPIOModul::Open(const std::string& configuration, const std::strin
 		}
 		id = pin["id"].GetInt();
 
-		if (!pin.HasMember("number"))
-		{
-			_State = IOModulResult::ErrorConf;
-			return _State;
-		}
-		pinNumber = pin["number"].GetInt();
-
 		if (!pin.HasMember("direction"))
 		{
 			_State = IOModulResult::ErrorConf;
@@ -122,51 +96,57 @@ IOModulResult GPIOModul::Open(const std::string& configuration, const std::strin
 		}
 		if (std::string(pin["direction"].GetString()) == std::string("in"))
 		{
-			dir = GPIOPinDirection::In;
+			dir = PCFDirection::In;
 		}
-		else
-		if (std::string(pin["direction"].GetString()) == std::string("out"))
+		else if (std::string(pin["direction"].GetString()) == std::string("out"))
 		{
-			dir = GPIOPinDirection::Out;
+			dir = PCFDirection::Out;
 		}
 		else
 		{
 			_State = IOModulResult::ErrorConf;
 			return _State;
 		}
-		GPIOPinConfig conf = GPIOPinConfig(dir, id, pinNumber);
+
+		if (!pin.HasMember("bit"))
+		{
+			_State = IOModulResult::ErrorConf;
+			return _State;
+		}
+		bit = pin["bit"].GetInt();
+		PCFPinConfig conf = PCFPinConfig(dir, id, bit);
 		_PinConfiguration[id] = conf;
-		
 	}
+	ResolveDriverSpecific(driverspecific);
 	Init();
 	return IOModulResult::Ok;
 }
 
-IOModulResult miModul::GPIOModul::Start()
+IOModulResult miModul::PCF8574Modul::Start()
 {
 	return IOModulResult::ErrorNotImplemented;
 }
 
-IOModulResult miModul::GPIOModul::Stop()
+IOModulResult miModul::PCF8574Modul::Stop()
 {
 	return IOModulResult::ErrorNotImplemented;
 }
 
-IOModulResult miModul::GPIOModul::Close()
+IOModulResult miModul::PCF8574Modul::Close()
 {
 	return Deinit();
 }
 
-IOModulResult miModul::GPIOModul::ReadInputs(const miIOImage::IOImage& image, const IOModulIOMap& map)
+IOModulResult miModul::PCF8574Modul::ReadInputs(const miIOImage::IOImage& image, const IOModulIOMap& map)
 {
-	bool val = false;
+	uint8_t val = false;
 	miDriver::DriverResults result = miDriver::DriverResults::Ok;
 	if (_PinConfiguration.count(map.Id()) == 0)
 	{
 		_State = IOModulResult::ErrorNotConfigured;
 		return _State;
 	}
-	val = _GPIODriver.GpioRead(_PinConfiguration[map.Id()].PinNumber(), &result);
+	result = _I2CDriver.I2CRead(0, 1, &val);
 	if (result != miDriver::DriverResults::Ok)
 	{
 		_State = IOModulResult::ErrorRead;
@@ -181,9 +161,9 @@ IOModulResult miModul::GPIOModul::ReadInputs(const miIOImage::IOImage& image, co
 	return IOModulResult::Ok;
 }
 
-IOModulResult miModul::GPIOModul::WriteOutputs(const miIOImage::IOImage& image, const IOModulIOMap& map)
+IOModulResult miModul::PCF8574Modul::WriteOutputs(const miIOImage::IOImage& image, const IOModulIOMap& map)
 {
-	bool val = false;
+	uint8_t val = false;
 	miDriver::DriverResults result = miDriver::DriverResults::Ok;
 	miIOImage::IOImageResult imageResult = miIOImage::IOImageResult::Ok;
 
@@ -199,33 +179,71 @@ IOModulResult miModul::GPIOModul::WriteOutputs(const miIOImage::IOImage& image, 
 		return _State;
 	}
 
-	result = _GPIODriver.GpioWrite(_PinConfiguration[map.Id()].PinNumber(),val);
+	result = _I2CDriver.I2CWrite(0, 1, &val);
 	if (result != miDriver::DriverResults::Ok)
 	{
 		_State = IOModulResult::ErrorWrite;
 		return _State;
 	}
-	
+
 	return IOModulResult::Ok;
 }
 
-IOModulResult miModul::GPIOModul::Control(const std::string name, const std::string function, uint32_t parameter)
+IOModulResult miModul::PCF8574Modul::Control(const std::string name, const std::string function, uint32_t parameter)
 {
 	_State = IOModulResult::ErrorNotImplemented;
 	return _State;
 }
 
+IOModulResult miModul::PCF8574Modul::ResolveDriverSpecific(const std::string& driverspecific)
+{
+	std::vector <std::string> params;
+	std::vector <std::string> values;
+	std::stringstream param(driverspecific);
+	std::string intermediate;
+	if (driverspecific == "")
+	{
+		return IOModulResult::ErrorConf;
+	}
+	while (std::getline(param, intermediate, ','))
+	{
+		params.push_back(intermediate);
+	}
+	if (params.size() > 1 || params.empty())
+	{
+		return IOModulResult::ErrorConf;
+	}
+	
+	for (std::string& par : params)
+	{
+		std::stringstream value(par);
+		while (std::getline(value, intermediate, '='))
+		{
+			values.push_back(intermediate);
+		}
+		if (values.size() != 3)
+		{
+			return IOModulResult::ErrorConf;
+		}
+		if (values[0] != std::string("address"))
+		{
+			return IOModulResult::ErrorConf;
+		}
+
+		_Address = static_cast<uint8_t>(std::stoi(values[1]));
+	}
+	return IOModulResult::Ok;;
+}
 
 extern "C"
 {
-	IOModulInterface* CreateIOModulInterface()
+	IOModulInterface* create()
 	{
-		return new GPIOModul();
+		return new PCF8574Modul();
 	}
-
-	void DestroyIOModulInterface(IOModulInterface* obj)
+	void destroy(IOModulInterface* obj)
 	{
-		GPIOModul* delObj = reinterpret_cast<GPIOModul*>(obj);
+		PCF8574Modul* delObj = reinterpret_cast<PCF8574Modul*>(obj);
 		delete delObj;
 		delObj = nullptr;
 	}

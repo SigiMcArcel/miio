@@ -5,6 +5,8 @@
 
 namespace miModul
 {
+	const std::string _IOMODULVERSION_ = "0.0.0.1";
+
 	typedef enum IOModulResult_e
 	{
 		Ok,
@@ -41,10 +43,15 @@ namespace miModul
 		const miIOImage::IOImageSize& Size() const { return _Size; };
 	};
 
+	
 	class IOModulInterface
-	{
+	{ 
 	public:
-		virtual IOModulResult Open(const std::string& configuration) = 0;
+		const std::string Version()
+		{
+			return _IOMODULVERSION_;
+		}
+		virtual IOModulResult Open(const std::string& configuration, const std::string& driverspecific) = 0;
 		virtual IOModulResult Start() = 0;
 		virtual IOModulResult Stop() = 0;
 		virtual IOModulResult Close() = 0;
@@ -52,6 +59,7 @@ namespace miModul
 		virtual IOModulResult WriteOutputs(const miIOImage::IOImage& image, const IOModulIOMap& map) = 0;
 		virtual IOModulResult Control(const std::string name, const std::string function, uint32_t parameter) = 0;
 	};
+
 }
 
 

@@ -1,5 +1,5 @@
 #include <dlfcn.h>
-#include "IOManager.h"
+#include <mi/miio/IOManager.h>
 #include <fstream>
 #include <iostream>
 #include <sstream> //std::stringstream
@@ -66,8 +66,10 @@ IOManagerResult miIOManager::IOManager::ReadConfig(const std::string& name, miIO
 {
     rapidjson::Document d;
     IOManagerResult result = IOManagerResult::Ok;
-    IOMap iMaps;
-    IOMap oMaps;
+    miIOImage::IOImageOffset bitSizeIn = 0;
+    miIOImage::IOImageSize bitSizeOut = 0;
+    IOModulValues iValues;
+    IOModulValues oValues;
     std::string path = _IOModulPath + std::string("/") + name + std::string(".json");
 
     std::ifstream inFile;
@@ -95,16 +97,69 @@ IOManagerResult miIOManager::IOManager::ReadConfig(const std::string& name, miIO
     }
     const rapidjson::Value& jsonname = mimoduldescription["name"];
 
-    result = ReadIOMaps(mimoduldescription, std::string("imaps"), iMaps, startInputOffset);
-    if(result != IOManagerResult::Ok)
+    if (!mimoduldescription.HasMember("modulconf"))
     {
-        return result;
+        return IOManagerResult::ErrorConfiguration;
     }
-    result = ReadIOMaps(mimoduldescription, std::string("omaps"), oMaps, startOutputOffset);
-    if (result != IOManagerResult::Ok)
+    const rapidjson::Value& modulconf = mimoduldescription["modulconf"];
+
+    if (!modulconf.HasMember("inputs"))
     {
-        return result;
+        return IOManagerResult::ErrorConfiguration;
     }
+    const rapidjson::Value& ivalues = modulconf["inputs"];
+
+    if (ivalues.Size() == 0)
+    {
+        return  IOManagerResult::ErrorConfiguration;
+    }
+
+    for (rapidjson::SizeType i = 0; i < ivalues.Size(); i++)
+    {
+        IOModulValue value;
+        result = ReadIOModuleValueConfig(ivalues[i], value);
+        if (result != IOManagerResult::Ok)
+        {
+            return result;
+        }
+        iValues[value.Name()] = value;
+    }
+
+    if (!modulconf.HasMember("outputs"))
+    {
+        return IOManagerResult::ErrorConfiguration;
+    }
+    const rapidjson::Value& ovalues = modulconf["outputs"];
+
+    if (ovalues.Size() == 0)
+    {
+        return  IOManagerResult::ErrorConfiguration;
+    }
+
+    for (rapidjson::SizeType i = 0; i < ovalues.Size(); i++)
+    {
+        IOModulValue value;
+        result = ReadIOModuleValueConfig(ovalues[i], value);
+        if (result != IOManagerResult::Ok)
+        {
+            return result;
+        }
+        oValues[value.Name()] = value;
+    }
+
+    if (!modulconf.HasMember("inputbitsize"))
+    {
+        return IOManagerResult::ErrorConfiguration;
+    }
+    bitSizeIn = modulconf["inputbitsize"].GetInt();
+
+    if (!modulconf.HasMember("outputbitsize"))
+    {
+        return IOManagerResult::ErrorConfiguration;
+    }
+    bitSizeOut = modulconf["outputbitsize"].GetInt();
+
+
     const rapidjson::Value& libname = mimoduldescription["libname"];
     if (!mimoduldescription.HasMember("libname"))
     {
@@ -121,12 +176,14 @@ IOManagerResult miIOManager::IOManager::ReadConfig(const std::string& name, miIO
         std::string(libPath),
         std::string(jsonname.GetString()),
         std::string(jsonString),
+        driverspecific,
         tp,
-        iMaps,
-        oMaps,
-        driverspecific);
+        iValues,
+        oValues,
+        bitSizeIn,
+        bitSizeOut);
 
-    if (desc.Interface().get()->Open(desc.Configuration(), desc.Driverspecific()) != miModul::IOModulResult::Ok)
+    if (desc.Interface().get()->Open(desc.Configuration(), desc.DriverSpecific()) != miModul::IOModulResult::Ok)
     {
         return IOManagerResult::ErrorLoadDriver;
     }
@@ -136,53 +193,30 @@ IOManagerResult miIOManager::IOManager::ReadConfig(const std::string& name, miIO
     return IOManagerResult::Ok;
 }
 
-IOManagerResult IOManager::ReadIOMaps(const rapidjson::Value& d,std::string key, IOMap& ioMaps,const miIOImage::IOImageOffset startOffset)
+IOManagerResult IOManager::ReadIOModuleValueConfig(const rapidjson::Value& d,IOModulValue& moduleValue)
 {
-    if (!d.HasMember(key.c_str()))
+    std::string name;
+    miIOImage::IOImageOffset bitOffset;
+    miIOImage::IOImageSize bitSize;
+
+    if (!d.HasMember("name"))
     {
         return IOManagerResult::ErrorConfiguration;
     }
-    const rapidjson::Value& iomaps = d[key.c_str()];
-
-
-    if (iomaps.Size() == 0)
+    name = std::string(d["name"].GetString());
+    if (!d.HasMember("bitoffset"))
     {
-        return  IOManagerResult::ErrorConfiguration;
+        return IOManagerResult::ErrorConfiguration;
     }
-
-    for (rapidjson::SizeType i = 0; i < iomaps.Size(); i++)
+    bitOffset = d["bitoffset"].GetInt();
+    if (!d.HasMember("bitsize"))
     {
-        int32_t id = 0;
-        int32_t offset = 0;
-        int32_t bitSize = 0;
-        int32_t driverSpecific;
-        const rapidjson::Value& map = iomaps[i];
-        if (!map.HasMember("id"))
-        {
-            return IOManagerResult::ErrorConfiguration;
-        }
-        id = map["id"].GetInt();
-        if (!map.HasMember("offset"))
-        {
-            return IOManagerResult::ErrorConfiguration;
-        }
-        offset = map["offset"].GetInt();
-        if (!map.HasMember("bitsize"))
-        {
-            return IOManagerResult::ErrorConfiguration;
-        }
-        bitSize = map["bitsize"].GetInt();
-        if (!map.HasMember("driverspecific"))
-        {
-            return IOManagerResult::ErrorConfiguration;
-        }
-        driverSpecific = map["driverspecific"].GetInt();
-
-        miModul::IOModulIOMap nMap(id, driverSpecific, offset + startOffset, bitSize);
-        ioMaps.iOMapMap[id] = nMap;
-        ioMaps._BitSize = bitSize;
-        bitSize += bitSize;
+        return IOManagerResult::ErrorConfiguration;
     }
+    bitSize = d["bitsize"].GetInt();
+    
+    moduleValue = IOModulValue(name, bitOffset, bitSize);
+
     return IOManagerResult::Ok;
 }
 
@@ -203,8 +237,8 @@ IOManagerResult IOManager::AddIOModul(const std::string& name, const std::string
     {
         return result;
     }
-    _ActInputOffset += std::prev(_ModulList.end())->second.IMap()._BitSize;
-    _ActOutputOffset += std::prev(_ModulList.end())->second.OMap()._BitSize;
+    _ActInputOffset += std::prev(_ModulList.end())->second.IOModulInputBitSize();
+    _ActOutputOffset += std::prev(_ModulList.end())->second.IOModulOutputBitSize();
     return result;
 }
 
@@ -230,9 +264,9 @@ IOManagerResult miIOManager::IOManager::ReadInputs()
         {
             continue;
         }
-        for (const auto& m : n.second.IMap().iOMapMap)
+        for (const auto& m : n.second.IOModulInputValues())
         {
-            result = n.second.Interface().get()->ReadInputs(_InputImage, m.second);
+            result = n.second.Interface().get()->ReadInputs(_InputImage,m.second.Offset(), m.second.Size());
         }
     }
     if(result != miModul::IOModulResult::Ok)
@@ -252,9 +286,9 @@ IOManagerResult miIOManager::IOManager::WriteOutputs()
             continue;
         }
        
-        for (const auto& m : n.second.OMap().iOMapMap)
+        for (const auto& m : n.second.IOModulOutputValues())
         {
-            result = n.second.Interface().get()->WriteOutputs(_OutputImage, m.second);
+            result = n.second.Interface().get()->WriteOutputs(_OutputImage,m.second.Offset(), m.second.Size());
         }
     }
     if (result != miModul::IOModulResult::Ok)
@@ -266,7 +300,7 @@ IOManagerResult miIOManager::IOManager::WriteOutputs()
 
 IOManagerResult IOManager::StartIOCycle(int cycleTime)
 {
-    return IOManagerResult::Ok;
+   
     if (_Timer.Start(cycleTime, this, 50, miutils::Schedulers::Fifo) != miutils::TimerResults::ErrorOk)
     {
         return IOManagerResult::ErrorStart;
@@ -328,34 +362,12 @@ IOManagerResult miIOManager::IOManager::IOModulControl(const std::string& name, 
 void miIOManager::IOManager::eventOccured(void* sender, const std::string& name)
 {
     miModul::IOModulResult result = miModul::IOModulResult::Ok;
+    miIOManager::IOManager* manager = reinterpret_cast<IOManager*>(sender);
     if (sender == nullptr)
     {
         return;
     }
-    
-    for (const auto& n : _ModulList)
-    {
-        if (n.second.Interface().get() == nullptr)
-        {
-            continue;
-        }
-        for (const auto& m : n.second.IMap().iOMapMap)
-        {
-            result = n.second.Interface().get()->ReadInputs(_InputImage, m.second);
-        }
-        if (result != miModul::IOModulResult::Ok)
-        {
-            _State = IOManagerResult::ErrorModulRead;
-        }
-        for (const auto& m : n.second.OMap().iOMapMap)
-        {
-            result = n.second.Interface().get()->WriteOutputs(_OutputImage, m.second);
-        }
 
-        if (result != miModul::IOModulResult::Ok)
-        {
-            _State =  IOManagerResult::ErrorModulWrite;
-        }
-        
-    }
+    manager->ReadInputs();
+    manager->WriteOutputs();
 }

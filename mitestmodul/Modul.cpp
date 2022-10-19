@@ -139,7 +139,7 @@ IOModulResult miModul::Modul::Close()
 	return Deinit();
 }
 
-IOModulResult miModul::Modul::ReadInputs(const miIOImage::IOImage& image, const IOModulIOMap& map)
+IOModulResult miModul::Modul::ReadInputs(const miIOImage::IOImage& image, const IOModulValue& map)
 {
 	bool val = false;
 	miIOImage::IOImageResult imageResult  = miIOImage::IOImageResult::Ok;
@@ -168,7 +168,7 @@ IOModulResult miModul::Modul::ReadInputs(const miIOImage::IOImage& image, const 
 	return IOModulResult::Ok;
 }
 
-IOModulResult miModul::Modul::WriteOutputs(const miIOImage::IOImage& image, const IOModulIOMap& map)
+IOModulResult miModul::Modul::WriteOutputs(const miIOImage::IOImage& image, const IOModulValue& map)
 {
 	bool val = false;
 	int byteOffset = map.Offset() / 8;

@@ -1,39 +1,36 @@
 #pragma once
+#include <rapidjson/document.h>
 #include <map>
 #include <mi/miio/IOModulBase.h>
 #include <mi/midriver/GPIODriver.h>
 
 namespace miModul
 {
-	typedef enum GPIOPinDirection_e
-	{
-		In,
-		Out
-	}GPIOPinDirection;
 	class GPIOPinConfig
 	{
 	private:
-		GPIOPinDirection _Direction;
-		int32_t _Id;
-		int32_t _PinNumber;
+		miIOImage::IOImageOffset _BitOffset;
+		int32_t _GpioNumber;
 	public:
 		GPIOPinConfig() = default;
-		GPIOPinConfig(GPIOPinDirection direction,int32_t id,int32_t pinNumber)
-			:_Direction(direction)
-			,_Id(id)
-			,_PinNumber(pinNumber)
+		GPIOPinConfig(miIOImage::IOImageOffset bitOffset,int32_t gpioNumber)
+			: _BitOffset(bitOffset)
+			, _GpioNumber(gpioNumber)
 		{}
 
-		const GPIOPinDirection& Direction() const { return _Direction; };
-		const int32_t& Id() const { return _Id; };
-		const int32_t& PinNumber() const { return _PinNumber; };
+		
+		const  miIOImage::IOImageOffset BitOffset() const { return _BitOffset; };
+		const int32_t GpioNumber() const { return _GpioNumber; };
 	};
 
 	class GPIOModul : public IOModulBase
 	{
 	private:
 		miDriver::GPIODriver _GPIODriver;
-		std::map<int32_t,GPIOPinConfig> _PinConfiguration;
+		std::map<int32_t,GPIOPinConfig> _PinOutConfiguration;
+		std::map<int32_t, GPIOPinConfig> _PinInConfiguration;
+
+		IOModulResult GetGpioConfig(const rapidjson::Value& item, GPIOPinConfig& config);
 
 	public:
 		GPIOModul();
@@ -42,6 +39,8 @@ namespace miModul
 		// Geerbt über IOModulBase
 		virtual IOModulResult Init();
 		virtual IOModulResult Deinit();
+		virtual IOModulResult ReadDriverSpecificInputConfig(const rapidjson::Value& item);
+		virtual IOModulResult ReadDriverSpecificOutputConfig(const rapidjson::Value& item);
 
 
 		// Geerbt über IOModulInterface
@@ -53,9 +52,9 @@ namespace miModul
 
 		virtual IOModulResult Close() override;
 
-		virtual IOModulResult ReadInputs(const miIOImage::IOImage& image,  const IOModulIOMap& map) override;
+		virtual IOModulResult ReadInputs(const miIOImage::IOImage& image, const miIOImage::IOImageOffset bitOffset, const miIOImage::IOImageSize bitSize) override;
 
-		virtual IOModulResult WriteOutputs(const miIOImage::IOImage& image, const IOModulIOMap& map) override;
+		virtual IOModulResult WriteOutputs(const miIOImage::IOImage& image, const miIOImage::IOImageOffset bitOffset, const miIOImage::IOImageSize bitSize) override;
 
 		virtual IOModulResult Control(const std::string name, const std::string function, uint32_t parameter) override;
 

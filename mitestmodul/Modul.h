@@ -52,9 +52,9 @@ namespace miModul
 
 		virtual IOModulResult Close() override;
 
-		virtual IOModulResult ReadInputs(const miIOImage::IOImage& image,  const IOModulIOMap& map) override;
+		virtual IOModulResult ReadInputs(const miIOImage::IOImage& image,  const IOModulValue& map) override;
 
-		virtual IOModulResult WriteOutputs(const miIOImage::IOImage& image, const IOModulIOMap& map) override;
+		virtual IOModulResult WriteOutputs(const miIOImage::IOImage& image, const IOModulValue& map) override;
 
 		virtual IOModulResult Control(const std::string name, const std::string function, uint32_t parameter) override;
 

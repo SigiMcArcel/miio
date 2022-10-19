@@ -26,10 +26,10 @@ namespace miModul
 
 	class IOModulBase : public IOModulInterface
 	{
-	private:
+	protected:
 		std::string _Name;
 		IOModulResult _State;
-		rapidjson::Document _ModuleDescription;
+		IOModulResult ReadModulConfiguration(const std::string& configuration);
 		
 	public:
 		IOModulBase()
@@ -38,13 +38,15 @@ namespace miModul
 		{
 			
 		};
+		~IOModulBase() = default;
 		const IOModulResult State() const
 		{
 			return _State;
 		}
-		virtual ~IOModulBase() = 0;
 		virtual IOModulResult Init() = 0;
 		virtual IOModulResult Deinit() = 0;
+		virtual IOModulResult ReadDriverSpecificInputConfig(const rapidjson::Value& item) = 0;
+		virtual IOModulResult ReadDriverSpecificOutputConfig(const rapidjson::Value& item) = 0;
 	
 	};
 }

@@ -1,5 +1,6 @@
 #pragma once
 #include <map>
+#include <rapidjson/document.h>
 #include <mi/miio/IOModulBase.h>
 #include <mi/midriver/I2CDriver.h>
 
@@ -45,6 +46,8 @@ namespace miModul
 		// Geerbt über IOModulBase
 		virtual IOModulResult Init();
 		virtual IOModulResult Deinit();
+		virtual IOModulResult ReadDriverSpecificInputConfig(const rapidjson::Value& item);
+		virtual IOModulResult ReadDriverSpecificOutputConfig(const rapidjson::Value& item);
 
 
 		// Geerbt über IOModulInterface
@@ -56,9 +59,9 @@ namespace miModul
 
 		virtual IOModulResult Close() override;
 
-		virtual IOModulResult ReadInputs(const miIOImage::IOImage& image, const IOModulIOMap& map) override;
+		virtual IOModulResult ReadInputs(const miIOImage::IOImage& image, const miIOImage::IOImageOffset bitOffset, const miIOImage::IOImageSize bitSize) override;
 
-		virtual IOModulResult WriteOutputs(const miIOImage::IOImage& image, const IOModulIOMap& map) override;
+		virtual IOModulResult WriteOutputs(const miIOImage::IOImage& image, const miIOImage::IOImageOffset bitOffset, const miIOImage::IOImageSize bitSize) override;
 
 		virtual IOModulResult Control(const std::string name, const std::string function, uint32_t parameter) override;
 

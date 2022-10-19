@@ -20,7 +20,7 @@ namespace miModul
 		ErrorDescriptionNotMatch
 	}IOModulResult;
 
-	class IOModulIOMap
+	class IOModulValue
 	{
 		int32_t _Id;
 		int32_t _Driverspecific;
@@ -28,8 +28,8 @@ namespace miModul
 		miIOImage::IOImageSize _Size;
 
 	public:
-		IOModulIOMap() = default;
-		IOModulIOMap(int32_t id, int32_t driverspecific, miIOImage::IOImageOffset offset, miIOImage::IOImageSize size)
+		IOModulValue() = default;
+		IOModulValue(int32_t id, int32_t driverspecific, miIOImage::IOImageOffset offset, miIOImage::IOImageSize size)
 		:_Id(id)
 		,_Driverspecific(driverspecific)
 		,_Offset(offset)
@@ -55,8 +55,8 @@ namespace miModul
 		virtual IOModulResult Start() = 0;
 		virtual IOModulResult Stop() = 0;
 		virtual IOModulResult Close() = 0;
-		virtual IOModulResult ReadInputs(const miIOImage::IOImage& image, const IOModulIOMap& map) = 0;
-		virtual IOModulResult WriteOutputs(const miIOImage::IOImage& image, const IOModulIOMap& map) = 0;
+		virtual IOModulResult ReadInputs(const miIOImage::IOImage& image,const miIOImage::IOImageOffset bitOffset,const miIOImage::IOImageSize bitSize) = 0;
+		virtual IOModulResult WriteOutputs(const miIOImage::IOImage& image, const miIOImage::IOImageOffset bitOffset, const miIOImage::IOImageSize bitSize) = 0;
 		virtual IOModulResult Control(const std::string name, const std::string function, uint32_t parameter) = 0;
 	};
 

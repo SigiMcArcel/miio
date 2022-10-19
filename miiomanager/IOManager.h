@@ -29,16 +29,33 @@ namespace miIOManager
 		ErrorModulFileNotFound
 }IOManagerResult;
 
+class IOModulValue
+{
+	std::string _Name;
+	miIOImage::IOImageOffset _BitOffset;
+	miIOImage::IOImageSize _BitSize;
+	
+
+public:
+	IOModulValue() = default;
+	IOModulValue(std::string name, miIOImage::IOImageOffset bitOffset, miIOImage::IOImageSize bitSize)
+		:_Name(name)
+		,_BitOffset(bitOffset)
+		, _BitSize(bitSize)
+	{
+
+	}
+	const miIOImage::IOImageOffset& Offset() const { return _BitOffset; };
+	const miIOImage::IOImageSize& Size() const { return _BitSize; };
+	const std::string Name() const { return _Name; };
+};
+
 typedef std::shared_ptr<miModul::IOModulInterface> IOModulInterface_p;
-typedef std::map<int32_t, miModul::IOModulIOMap> IOMapMap;
+typedef std::map<std::string, IOModulValue> IOModulValues;
 typedef int16_t IOModulAddress;
 typedef int16_t IOModulSubAddress;
 
-typedef struct IOMap_t
-{
-	IOMapMap iOMapMap;
-	miIOImage::IOImageSize _BitSize;
-}IOMap;
+
 
 class IOModulDescription
 {
@@ -46,57 +63,48 @@ private:
 	std::string _Library;
 	std::string _Name;
 	std::string _Configuration;
+	std::string _DriverSpecific;
 	IOModulInterface_p _Interface;
-	IOMap _IMap;
-	IOMap _OMap;
-	std::string _Driverspecific;
+	IOModulValues _IOModulInputValues;
+	IOModulValues _IOModulOutputValues;
+	miIOImage::IOImageSize _IOModulInputBitSize;
+	miIOImage::IOImageSize _IOModulOutputBitSize;
 
 public:
 	IOModulDescription() = default;
 	IOModulDescription(const std::string& library,
 		const std::string& name,
 		const std::string& configuration,
+		const std::string driverSpecific,
 		const IOModulInterface_p& modulInterface,
-		IOMap iMap,
-		IOMap oMap,
-		const std::string& driverspecific
+		const IOModulValues& iValues,
+		const IOModulValues& oValues,
+		miIOImage::IOImageSize ioModulInputBitSize,
+		miIOImage::IOImageSize ioModulOutputBitSize
 	)
 		:_Library(library)
 		, _Name(name)
 		, _Configuration(configuration)
+		, _DriverSpecific(driverSpecific)
 		, _Interface(modulInterface)
-		, _IMap(iMap)
-		, _OMap(oMap)
-		, _Driverspecific(driverspecific)
+		, _IOModulInputValues(iValues)
+		, _IOModulOutputValues(oValues)
+		,_IOModulInputBitSize(ioModulInputBitSize)
+		,_IOModulOutputBitSize(ioModulOutputBitSize)
 	{
 
 	}
 
-	IOModulDescription(const std::string& library,
-		const std::string& name,
-		const std::string& configuration,
-		const IOModulInterface_p& modulInterface,
-		IOMap iMap,
-		IOMap oMap
-	)
-		:_Library(library)
-		, _Name(name)
-		, _Configuration(configuration)
-		, _Interface(modulInterface)
-		, _IMap(iMap)
-		, _OMap(oMap)
-		, _Driverspecific("")
-	{
-
-	}
 
 	const std::string& Library() const { return _Library; };
 	const std::string& Name() const { return _Name; };
 	const std::string& Configuration() const { return _Configuration; };
+	const std::string& DriverSpecific() const { return _DriverSpecific; };
 	const IOModulInterface_p& Interface() const { return _Interface; };
-	const IOMap& IMap() const { return _IMap; };
-	const IOMap& OMap() const { return _OMap; };
-	const std::string& Driverspecific() const { return _Driverspecific; };
+	const IOModulValues& IOModulInputValues() const { return _IOModulInputValues; };
+	const IOModulValues& IOModulOutputValues() const { return _IOModulOutputValues; };
+	const miIOImage::IOImageSize IOModulInputBitSize() const { return _IOModulInputBitSize; };
+	const miIOImage::IOImageSize IOModulOutputBitSize() const { return _IOModulOutputBitSize; };
 	
 };
 
@@ -119,7 +127,7 @@ private:
 	IOModulInterface_p LoadModul(const std::string& libraryName,IOManagerResult& result);
 	IOManagerResult UnLoadModul(const std::string& libraryName, const IOModulInterface_p& obj);
 	IOManagerResult ReadConfig(const std::string& name, miIOImage::IOImageOffset startInputOffset, miIOImage::IOImageOffset startOutputOffset, const std::string& driverspecific);
-	IOManagerResult ReadIOMaps(const rapidjson::Value& d, std::string key, IOMap& iomap,const miIOImage::IOImageOffset startOffset);
+	IOManagerResult ReadIOModuleValueConfig(const rapidjson::Value& d,IOModulValue& moduleValue);
 
 public:
 	IOManager(miIOImage::IOImageSize inputImageSize, miIOImage::IOImageSize outputImageSize, const std::string& ioModulPath);

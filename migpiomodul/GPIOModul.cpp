@@ -1,5 +1,4 @@
 #include "GPIOModul.h"
-#include <rapidjson/document.h>
 #include <rapidjson/writer.h>
 #include <rapidjson/stringbuffer.h>
 #include <string>
@@ -21,23 +20,32 @@ miModul::GPIOModul::~GPIOModul()
 IOModulResult miModul::GPIOModul::Init()
 {
 	miDriver::DriverResults result = miDriver::DriverResults::Ok;
-	int32_t iDir = 0;
 	_State = IOModulResult::Ok;
-	for (const auto& n : _PinConfiguration)
+	for (const auto& n : _PinInConfiguration)
 	{
-		result = _GPIODriver.GpioEnable(n.second.PinNumber(), true);
+		result = _GPIODriver.GpioEnable(n.second.GpioNumber(), true);
 		if (result != miDriver::DriverResults::Ok)
 		{
 			_State = IOModulResult::ErrorInit;
 		}
-		if (n.second.Direction() == GPIOPinDirection::In)
-		{
-			iDir = 1;
-		}
-		result = _GPIODriver.GpioSetDirection(n.second.PinNumber(), iDir);
+		result = _GPIODriver.GpioSetDirection(n.second.GpioNumber(), 1);
 		if (result != miDriver::DriverResults::Ok)
 		{
-			_GPIODriver.GpioEnable(n.second.PinNumber(), false);
+			_GPIODriver.GpioEnable(n.second.GpioNumber(), false);
+			_State = IOModulResult::ErrorInit;
+		}
+	}
+	for (const auto& n : _PinOutConfiguration)
+	{
+		result = _GPIODriver.GpioEnable(n.second.GpioNumber(), true);
+		if (result != miDriver::DriverResults::Ok)
+		{
+			_State = IOModulResult::ErrorInit;
+		}
+		result = _GPIODriver.GpioSetDirection(n.second.GpioNumber(), 0);
+		if (result != miDriver::DriverResults::Ok)
+		{
+			_GPIODriver.GpioEnable(n.second.GpioNumber(), false);
 			_State = IOModulResult::ErrorInit;
 		}
 	}
@@ -46,100 +54,54 @@ IOModulResult miModul::GPIOModul::Init()
 
 IOModulResult miModul::GPIOModul::Deinit()
 {
-	for (const auto& n : _PinConfiguration)
+	for (const auto& n : _PinInConfiguration)
 	{
-		_GPIODriver.GpioEnable(n.second.PinNumber(), false);
+		_GPIODriver.GpioEnable(n.second.GpioNumber(), false);
+	}
+	for (const auto& n : _PinOutConfiguration)
+	{
+		_GPIODriver.GpioEnable(n.second.GpioNumber(), false);
 	}
 	return IOModulResult::Ok;
 }
 
+IOModulResult miModul::GPIOModul::ReadDriverSpecificInputConfig(const rapidjson::Value& item)
+{
+	GPIOPinConfig config;
+	IOModulResult result = GetGpioConfig(item, config);
+	if (result == IOModulResult::Ok)
+	{
+		_State = result;
+		return _State;
+	}
+	_PinInConfiguration[config.BitOffset()] = config;
+	_State = IOModulResult::Ok;
+	return _State;
+}
+
+IOModulResult miModul::GPIOModul::ReadDriverSpecificOutputConfig(const rapidjson::Value& item)
+{
+	GPIOPinConfig config;
+	IOModulResult result = GetGpioConfig(item, config);
+	if (result == IOModulResult::Ok)
+	{
+		_State = result;
+		return _State;
+	}
+	_PinOutConfiguration[config.BitOffset()] = config;
+	_State = IOModulResult::Ok;
+	return _State;
+}
+
 IOModulResult GPIOModul::Open(const std::string& configuration, const std::string& driverspecific)
 {
-	rapidjson::Document d;
-	d.Parse(configuration.c_str());
-	if (!d.HasMember("mimoduldescription"))
+	_State = ReadModulConfiguration(configuration);
+	if (_State != IOModulResult::Ok)
 	{
-		_State = IOModulResult::ErrorConf;
 		return _State;
 	}
-	const rapidjson::Value& mimoduldescription = d["mimoduldescription"];
-
-	if (!mimoduldescription.HasMember("name"))
-	{
-		_State = IOModulResult::ErrorConf;
-		return _State;
-	}
-	const rapidjson::Value& name = mimoduldescription["name"];
-	if (std::string(name.GetString()) != _Name)
-	{
-		_State = IOModulResult::ErrorDescriptionNotMatch;
-		return _State;
-	}
-
-	if (!mimoduldescription.HasMember("modulconf"))
-	{
-		return IOModulResult::ErrorConf;
-	}
-	const rapidjson::Value& modulconf = mimoduldescription["modulconf"];
-	
-	if (!modulconf.HasMember("gpiopins"))
-	{
-		_State = IOModulResult::ErrorConf;
-		return _State;
-	}
-	const rapidjson::Value& gpiopins = modulconf["gpiopins"];
-	if (gpiopins.Size() == 0)
-	{
-		_State = IOModulResult::ErrorConf;
-		return _State;
-	}
-
-	for (rapidjson::SizeType i = 0; i < gpiopins.Size(); i++)
-	{
-		GPIOPinDirection dir;
-		int32_t id = 0;
-		int32_t pinNumber = 0;
-		const rapidjson::Value& pin = gpiopins[i];
-
-		if (!pin.HasMember("id"))
-		{
-			_State = IOModulResult::ErrorConf;
-			return _State;
-		}
-		id = pin["id"].GetInt();
-
-		if (!pin.HasMember("number"))
-		{
-			_State = IOModulResult::ErrorConf;
-			return _State;
-		}
-		pinNumber = pin["number"].GetInt();
-
-		if (!pin.HasMember("direction"))
-		{
-			_State = IOModulResult::ErrorConf;
-			return _State;
-		}
-		if (std::string(pin["direction"].GetString()) == std::string("in"))
-		{
-			dir = GPIOPinDirection::In;
-		}
-		else
-		if (std::string(pin["direction"].GetString()) == std::string("out"))
-		{
-			dir = GPIOPinDirection::Out;
-		}
-		else
-		{
-			_State = IOModulResult::ErrorConf;
-			return _State;
-		}
-		GPIOPinConfig conf = GPIOPinConfig(dir, id, pinNumber);
-		_PinConfiguration[id] = conf;
-		
-	}
-	Init();
-	return IOModulResult::Ok;
+	_State = Init();
+	return _State;
 }
 
 IOModulResult miModul::GPIOModul::Start()
@@ -157,22 +119,18 @@ IOModulResult miModul::GPIOModul::Close()
 	return Deinit();
 }
 
-IOModulResult miModul::GPIOModul::ReadInputs(const miIOImage::IOImage& image, const IOModulIOMap& map)
+IOModulResult miModul::GPIOModul::ReadInputs(const miIOImage::IOImage& image, const miIOImage::IOImageOffset bitOffset, const miIOImage::IOImageSize bitSize)
 {
 	bool val = false;
 	miDriver::DriverResults result = miDriver::DriverResults::Ok;
-	if (_PinConfiguration.count(map.Id()) == 0)
-	{
-		_State = IOModulResult::ErrorNotConfigured;
-		return _State;
-	}
-	val = _GPIODriver.GpioRead(_PinConfiguration[map.Id()].PinNumber(), &result);
+	
+	val = _GPIODriver.GpioRead(_PinInConfiguration[bitOffset].GpioNumber(), &result);
 	if (result != miDriver::DriverResults::Ok)
 	{
 		_State = IOModulResult::ErrorRead;
 		return _State;
 	}
-	miIOImage::IOImageResult imageResult = image.WriteBit(map.Offset(), val);
+	miIOImage::IOImageResult imageResult = image.WriteBit(bitOffset, val);
 	if (imageResult != miIOImage::IOImageResult::Ok)
 	{
 		_State = IOModulResult::ErrorRead;
@@ -181,25 +139,21 @@ IOModulResult miModul::GPIOModul::ReadInputs(const miIOImage::IOImage& image, co
 	return IOModulResult::Ok;
 }
 
-IOModulResult miModul::GPIOModul::WriteOutputs(const miIOImage::IOImage& image, const IOModulIOMap& map)
+IOModulResult miModul::GPIOModul::WriteOutputs(const miIOImage::IOImage& image, const miIOImage::IOImageOffset bitOffset, const miIOImage::IOImageSize bitSize)
 {
 	bool val = false;
 	miDriver::DriverResults result = miDriver::DriverResults::Ok;
 	miIOImage::IOImageResult imageResult = miIOImage::IOImageResult::Ok;
 
-	if (_PinConfiguration.count(map.Id()) == 0)
-	{
-		_State = IOModulResult::ErrorNotConfigured;
-		return _State;
-	}
-	val = image.ReadBit(map.Offset(), imageResult);
+	
+	val = image.ReadBit(bitOffset, imageResult);
 	if (imageResult != miIOImage::IOImageResult::Ok)
 	{
 		_State = IOModulResult::ErrorWrite;
 		return _State;
 	}
 
-	result = _GPIODriver.GpioWrite(_PinConfiguration[map.Id()].PinNumber(),val);
+	result = _GPIODriver.GpioWrite(_PinOutConfiguration[bitOffset].GpioNumber(),val);
 	if (result != miDriver::DriverResults::Ok)
 	{
 		_State = IOModulResult::ErrorWrite;
@@ -215,6 +169,33 @@ IOModulResult miModul::GPIOModul::Control(const std::string name, const std::str
 	return _State;
 }
 
+IOModulResult miModul::GPIOModul::GetGpioConfig(const rapidjson::Value& item, GPIOPinConfig& config)
+{
+
+		int32_t gpioNumber = 0;
+		miIOImage::IOImageOffset bitOffset = 0;
+		
+		if (!item.HasMember("bitoffset"))
+		{
+			return IOModulResult::ErrorConf;
+		}
+		bitOffset = item["bitOffset"].GetInt();
+
+		if (!item.HasMember("driverspecific"))
+		{
+			return IOModulResult::ErrorConf;
+		}
+		const rapidjson::Value& driverspecific = item["driverspecific"];
+
+		if (!driverspecific.HasMember("gpionumber"))
+		{
+			return IOModulResult::ErrorConf;
+		}
+		gpioNumber = driverspecific["gpionumber"].GetInt();
+
+		config = GPIOPinConfig(bitOffset,gpioNumber);
+		return IOModulResult();
+}
 
 extern "C"
 {

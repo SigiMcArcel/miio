@@ -1,6 +1,9 @@
 #include <cstdio>
 #include <mi/miio/IOManager.h>
 #include <mi/miio/IOImage.h>
+#include <mi/miio/IOModulInterface.h>
+#include <mi/miio/IOModulLoader.h>
+#include <mi/miio/GPIOModul.h>
 #include <string>
 #include <fstream>
 #include <iostream>
@@ -22,31 +25,32 @@ void signal_callback_handler(int signum) {
 
 int main()
 {
-
+    miIOImage::IOImage iimage(1024, miIOImage::IOImageType::Input, std::string("in"));
+    miIOImage::IOImage oimage(1024, miIOImage::IOImageType::Output, std::string("out"));
    
-    miIOManager::IOManagerResult mResult = miIOManager::IOManagerResult::Ok;
    
-    miIOImage::IOImage image(1024, miIOImage::IOImageType::Input,"image");
-    signal(SIGINT, signal_callback_handler);
-    std::ifstream inFile;
-    inFile.open("/home/root/mitestmodul.json"); //open the input file
 
+    {
+       // miIOManager::IOModulLoader GpioModul(std::string("libmigpiomodul"), std::string("0.0.0.2"));
+        miModul::GPIOModul gpioModul;
+        gpioModul.Open("");
+        gpioModul.Start();
+        gpioModul.ReadInputs(iimage, 0, 0);
+        gpioModul.WriteOutputs(oimage, 0, 0);
+        gpioModul.Stop();
+        gpioModul.Close();
+    }
 
-    
+    {
+        miIOManager::IOModulLoader PcfModul(std::string("libmipcfmodul"), std::string("0.0.0.1"));
+        PcfModul.Open("Address=12");
+        PcfModul.Start();
+        PcfModul.ReadInputs(iimage, 0, 0);
+        PcfModul.WriteOutputs(oimage, 0, 0);
+        PcfModul.Stop();
+        PcfModul.Close();
+    }
 
-    std::stringstream strStream;
-    strStream << inFile.rdbuf(); //read the file
-    std::string str = strStream.str(); //str holds the content of the file
-    miIOManager::IOManager manager(2048, 2048);
-    miIOImage::IOImage inputImage = manager.InputImage();
-    miIOImage::IOImage outputImage = manager.InputImage();
-
-
-    mResult = manager.AddIOModul(str);
-    mResult = manager.IOModulControl("migtestodul", "uzuz", 7);
-    mResult = manager.StopIOCycle();
-    mResult = manager.StartIOCycle(20);
-    uint8_t val = 8;
     
 
     while (!exit1)

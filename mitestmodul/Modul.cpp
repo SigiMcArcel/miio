@@ -35,7 +35,7 @@ IOModulResult miModul::Modul::Deinit()
 }
 
 
-IOModulResult Modul::Open(const std::string& configuration)
+IOModulResult Modul::Open(const std::string& descriptionFile, const std::string& configuration)
 {
 	rapidjson::Document d;
 	d.Parse(configuration.c_str());

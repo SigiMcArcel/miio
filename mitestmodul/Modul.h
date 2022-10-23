@@ -44,7 +44,7 @@ namespace miModul
 
 
 		// Geerbt über IOModulInterface
-		virtual IOModulResult Open(const std::string& configuration) override;
+		virtual IOModulResult Open(const std::string& descriptionFile, const std::string& configuration) override;
 
 		virtual IOModulResult Start() override;
 

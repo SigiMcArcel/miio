@@ -5,9 +5,15 @@
     <ClInclude Include="..\miiomodule\IOModulInterface.h">
       <Filter>IOModul</Filter>
     </ClInclude>
+    <ClInclude Include="..\miiomodule\IOModul.h">
+      <Filter>IOModul</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="IOManager.cpp" />
+    <ClCompile Include="..\miiomodule\IOModul.cpp">
+      <Filter>IOModul</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="IOModul">

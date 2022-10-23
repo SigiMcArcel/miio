@@ -23,17 +23,23 @@ namespace miModul
 	
 	typedef std::string ModulIOConfiguration;
 	
+	
 
 	class IOModulBase : public IOModulInterface
 	{
+	
+		
 	protected:
 		std::string _Name;
+		std::string _IOModuleDescriptionPath;
+		
 		IOModulResult _State;
-		IOModulResult ReadModulConfiguration(const std::string& configuration);
+		IOModulResult ReadModulConfiguration(const std::string& descriptionFile);
 		
 	public:
 		IOModulBase()
-			: _Name("Modul")
+			:_Name("Modul")
+			, _IOModuleDescriptionPath("/etc/mi/iomodules")
 			,_State(IOModulResult::Ok)
 		{
 			

@@ -97,6 +97,9 @@
     <Link>
       <LibraryDependencies>midriver;miioimage</LibraryDependencies>
     </Link>
+    <RemotePostBuildEvent>
+      <Command>cp $(RemoteDebuggerCommand) /usr/lib </Command>
+    </RemotePostBuildEvent>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets" />

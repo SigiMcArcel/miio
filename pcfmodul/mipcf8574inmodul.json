@@ -1,6 +1,6 @@
 {
   "mimoduldescription": {
-    "name": "mipcf8574inmodul",
+    "drivername": "mipcf8574modul",
     "libname": "mipcfmodul",
     "modulconf": {
       "inputbitsize": 8,

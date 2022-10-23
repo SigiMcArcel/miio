@@ -41,9 +41,9 @@ IOModulResult PCF8574Modul::ReadDriverSpecificOutputConfig(const rapidjson::Valu
 	return IOModulResult::Ok;
 }
 
-IOModulResult PCF8574Modul::Open(const std::string& configuration, const std::string& driverspecific)
+IOModulResult PCF8574Modul::Open(const std::string& descriptionFile, const std::string& driverspecific)
 {
-	_State = ReadModulConfiguration(configuration);
+	_State = ReadModulConfiguration(descriptionFile);
 	if (_State != IOModulResult::Ok)
 	{
 		return _State;
@@ -145,11 +145,13 @@ IOModulResult miModul::PCF8574Modul::ResolveDriverSpecific(const std::string& dr
 		{
 			values.push_back(intermediate);
 		}
-		if (values.size() != 3)
+		if (values.size() != 2)
 		{
 			return IOModulResult::ErrorConf;
 		}
-		if (values[0] != std::string("address"))
+		std::string val1 = values[0];
+		std::string val2 = std::string("address");
+		if (val1 != val2)
 		{
 			return IOModulResult::ErrorConf;
 		}
@@ -161,11 +163,11 @@ IOModulResult miModul::PCF8574Modul::ResolveDriverSpecific(const std::string& dr
 
 extern "C"
 {
-	IOModulInterface* create()
+	IOModulInterface* CreateIOModulInterface()
 	{
 		return new PCF8574Modul();
 	}
-	void destroy(IOModulInterface* obj)
+	void DestroyIOModulInterface(IOModulInterface* obj)
 	{
 		PCF8574Modul* delObj = reinterpret_cast<PCF8574Modul*>(obj);
 		delete delObj;

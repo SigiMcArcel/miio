@@ -2,7 +2,7 @@
 #include <mi/miio/IOManager.h>
 #include <mi/miio/IOImage.h>
 #include <mi/miio/IOModulInterface.h>
-#include <mi/miio/IOModulLoader.h>
+#include <mi/miio/IOModul.h>
 #include <mi/miio/GPIOModul.h>
 #include <string>
 #include <fstream>
@@ -30,25 +30,46 @@ int main()
    
    
 
-    {
-       // miIOManager::IOModulLoader GpioModul(std::string("libmigpiomodul"), std::string("0.0.0.2"));
-        miModul::GPIOModul gpioModul;
-        gpioModul.Open("");
+    
+    
+    miModul::IOModul gpioModul(std::string("migpiomodul"));
+        if (gpioModul.State() != miModul::IOManagerModulLoadResult::Ok)
+        {
+            printf("Error %d!\n", gpioModul.State());
+        }
+        gpioModul.Open("migpiomodul", "");
         gpioModul.Start();
         gpioModul.ReadInputs(iimage, 0, 0);
         gpioModul.WriteOutputs(oimage, 0, 0);
         gpioModul.Stop();
         gpioModul.Close();
-    }
+    
 
     {
-        miIOManager::IOModulLoader PcfModul(std::string("libmipcfmodul"), std::string("0.0.0.1"));
-        PcfModul.Open("Address=12");
+            miModul::IOModul PcfModul(std::string("mipcfmodul"));
+        if (PcfModul.State() != miModul::IOManagerModulLoadResult::Ok)
+        {
+            printf("Error %d!\n", PcfModul.State());
+        }
+        miModul::IOModulResult result = PcfModul.Open("mipcf8574inmodul", "address=12");
         PcfModul.Start();
         PcfModul.ReadInputs(iimage, 0, 0);
         PcfModul.WriteOutputs(oimage, 0, 0);
         PcfModul.Stop();
         PcfModul.Close();
+    }
+    {
+        miModul::IOModul PcfModu1l(std::string("mipcfmodul"));
+        if (PcfModu1l.State() != miModul::IOManagerModulLoadResult::Ok)
+        {
+            printf("Error %d!\n", PcfModu1l.State());
+        }
+        miModul::IOModulResult result = PcfModu1l.Open("mipcf8574outmodul", "address=13");
+        PcfModu1l.Start();
+        PcfModu1l.ReadInputs(iimage, 0, 0);
+        PcfModu1l.WriteOutputs(oimage, 0, 0);
+        PcfModu1l.Stop();
+        PcfModu1l.Close();
     }
 
     

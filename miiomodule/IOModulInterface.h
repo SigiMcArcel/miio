@@ -5,7 +5,7 @@
 
 namespace miModul
 {
-	const std::string _IOMODULVERSION_ = "0.0.0.1";
+	const std::string _IOMODULVERSION_ = "0.0.0.2";
 
 	typedef enum IOModulResult_e
 	{
@@ -17,7 +17,8 @@ namespace miModul
 		ErrorControl,
 		ErrorNotConfigured,
 		ErrorNotImplemented,
-		ErrorDescriptionNotMatch
+		ErrorDescriptionNotMatch,
+		ErrorConfigurationFileNotFound
 	}IOModulResult;
 
 	class IOModulValue
@@ -51,7 +52,7 @@ namespace miModul
 		{
 			return _IOMODULVERSION_;
 		}
-		virtual IOModulResult Open(const std::string& configuration, const std::string& driverspecific) = 0;
+		virtual IOModulResult Open(const std::string& descriptionFile,const std::string& driverspecific) = 0;
 		virtual IOModulResult Start() = 0;
 		virtual IOModulResult Stop() = 0;
 		virtual IOModulResult Close() = 0;

@@ -112,8 +112,12 @@
       <LibraryDependencies>midriver;miioimage</LibraryDependencies>
     </Link>
     <RemotePostBuildEvent>
-      <Command>cp $(RemoteDebuggerCommand) /usr/lib</Command>
+      <Command>cp $(RemoteDebuggerCommand) /usr/lib &amp;&amp; cp $(RemoteDeployDir)/migpiomodul/GPIOModul.h  /usr/include/mi/miio &amp;&amp; cp $(RemoteDeployDir)/miiomodule/IOModulBase.h  /usr/include/mi/miio</Command>
     </RemotePostBuildEvent>
+    <PreBuildEvent>
+      <Command>
+      </Command>
+    </PreBuildEvent>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets" />

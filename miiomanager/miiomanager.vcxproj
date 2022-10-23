@@ -36,9 +36,11 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\miiomodule\IOModulInterface.h" />
+    <ClInclude Include="..\miiomodule\IOModul.h" />
     <ClInclude Include="IOManager.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\miiomodule\IOModul.cpp" />
     <ClCompile Include="IOManager.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

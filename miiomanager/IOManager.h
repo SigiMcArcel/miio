@@ -9,11 +9,12 @@
 #include <mi/miutils/Event.h>
 #include <mi/miutils/Timer.h>
 #include <mi/miio/IOImage.h>
-#include "mi/miio/IOModulInterface.h"
+#include <mi/miio/IOModul.h>
 
 namespace miIOManager
 {
-	typedef enum IOManagerResult_e
+
+	typedef enum class IOManagerResult_e
 	{
 		Ok,
 		ErrorParameter,
@@ -27,7 +28,7 @@ namespace miIOManager
 		ErrorConfiguration,
 		ErrorModulStart,
 		ErrorModulFileNotFound
-}IOManagerResult;
+	}IOManagerResult;
 
 class IOModulValue
 {
@@ -50,7 +51,6 @@ public:
 	const std::string Name() const { return _Name; };
 };
 
-typedef std::shared_ptr<miModul::IOModulInterface> IOModulInterface_p;
 typedef std::map<std::string, IOModulValue> IOModulValues;
 typedef int16_t IOModulAddress;
 typedef int16_t IOModulSubAddress;
@@ -61,10 +61,10 @@ class IOModulDescription
 {
 private:
 	std::string _Library;
-	std::string _Name;
-	std::string _Configuration;
+	std::string _DescriptionName;
+	std::string _InstanceName;
 	std::string _DriverSpecific;
-	IOModulInterface_p _Interface;
+	miModul::IOModul _IOModul;
 	IOModulValues _IOModulInputValues;
 	IOModulValues _IOModulOutputValues;
 	miIOImage::IOImageSize _IOModulInputBitSize;
@@ -72,21 +72,22 @@ private:
 
 public:
 	IOModulDescription() = default;
-	IOModulDescription(const std::string& library,
-		const std::string& name,
-		const std::string& configuration,
+	IOModulDescription(
+		const std::string& library,
+		const std::string& descriptionName,
+		const std::string& instanceName,
 		const std::string driverSpecific,
-		const IOModulInterface_p& modulInterface,
+		const miModul::IOModul& ioModul,
 		const IOModulValues& iValues,
 		const IOModulValues& oValues,
 		miIOImage::IOImageSize ioModulInputBitSize,
 		miIOImage::IOImageSize ioModulOutputBitSize
 	)
 		:_Library(library)
-		, _Name(name)
-		, _Configuration(configuration)
+		, _DescriptionName(descriptionName)
+		, _InstanceName(instanceName)
 		, _DriverSpecific(driverSpecific)
-		, _Interface(modulInterface)
+		, _IOModul(ioModul)
 		, _IOModulInputValues(iValues)
 		, _IOModulOutputValues(oValues)
 		,_IOModulInputBitSize(ioModulInputBitSize)
@@ -97,10 +98,10 @@ public:
 
 
 	const std::string& Library() const { return _Library; };
-	const std::string& Name() const { return _Name; };
-	const std::string& Configuration() const { return _Configuration; };
+	const std::string& DescriptionName() const { return _DescriptionName; };
+	const std::string& InstanceName() const { return _InstanceName; };
 	const std::string& DriverSpecific() const { return _DriverSpecific; };
-	const IOModulInterface_p& Interface() const { return _Interface; };
+	const miModul::IOModul& IOModul() const { return _IOModul; };
 	const IOModulValues& IOModulInputValues() const { return _IOModulInputValues; };
 	const IOModulValues& IOModulOutputValues() const { return _IOModulOutputValues; };
 	const miIOImage::IOImageSize IOModulInputBitSize() const { return _IOModulInputBitSize; };
@@ -112,9 +113,7 @@ class IOManager : public miutils::EventListener
 {
 private:
 
-	const std::string IOModulCreationFunctionName = "CreateIOModulInterface";
-	const std::string IOModulDestroyFunctionName = "DestroyIOModulInterface";
-
+	const std::string  _IOModulDescriptionPath = "/etc/mi/iomodules";
 	miIOImage::IOImage _InputImage;
 	miIOImage::IOImage _OutputImage;
 	std::map<std::string,IOModulDescription> _ModulList;
@@ -124,16 +123,28 @@ private:
 	std::string _IOModulPath;
 	IOManagerResult _State;
 
-	IOModulInterface_p LoadModul(const std::string& libraryName,IOManagerResult& result);
-	IOManagerResult UnLoadModul(const std::string& libraryName, const IOModulInterface_p& obj);
-	IOManagerResult ReadConfig(const std::string& name, miIOImage::IOImageOffset startInputOffset, miIOImage::IOImageOffset startOutputOffset, const std::string& driverspecific);
+	
+	IOManagerResult ReadConfig(
+		const std::string& descriptionName
+		,miIOImage::IOImageOffset startInputOffset
+		,miIOImage::IOImageOffset startOutputOffset
+		,const std::string& driverspecific
+		,IOModulDescription& desc);
 	IOManagerResult ReadIOModuleValueConfig(const rapidjson::Value& d,IOModulValue& moduleValue);
 
 public:
-	IOManager(miIOImage::IOImageSize inputImageSize, miIOImage::IOImageSize outputImageSize, const std::string& ioModulPath);
+	IOManager(miIOImage::IOImageSize inputImageSize, miIOImage::IOImageSize outputImageSize);
 		
-	IOManagerResult AddIOModul(const std::string& name,const std::string& driverspecific);
-	IOManagerResult AddIOModul(const miIOImage::IOImageOffset inputOffset, const miIOImage::IOImageOffset outputOffset, const std::string& name, const std::string& driverspecific);
+	IOManagerResult AddIOModul(
+		const std::string& instanceName
+		,const std::string& descriptionName
+		,const std::string& driverspecific);
+	IOManagerResult AddIOModul(
+		const std::string& instanceName
+		,const std::string& descriptionName
+		,const std::string& driverspecific
+		,const miIOImage::IOImageOffset inputOffset
+		,const miIOImage::IOImageOffset outputOffset);
 	IOManagerResult RemoveIOModul(const std::string& name);
 	IOManagerResult ReadInputs();
 	IOManagerResult WriteOutputs();

@@ -2,8 +2,8 @@
 #include <rapidjson/writer.h>
 #include <rapidjson/stringbuffer.h>
 #include <string>
-
-
+#include <iostream>
+#include <fstream>
 
 using namespace miModul;
 
@@ -69,7 +69,7 @@ IOModulResult miModul::GPIOModul::ReadDriverSpecificInputConfig(const rapidjson:
 {
 	GPIOPinConfig config;
 	IOModulResult result = GetGpioConfig(item, config);
-	if (result == IOModulResult::Ok)
+	if (result != IOModulResult::Ok)
 	{
 		_State = result;
 		return _State;
@@ -83,7 +83,7 @@ IOModulResult miModul::GPIOModul::ReadDriverSpecificOutputConfig(const rapidjson
 {
 	GPIOPinConfig config;
 	IOModulResult result = GetGpioConfig(item, config);
-	if (result == IOModulResult::Ok)
+	if (result != IOModulResult::Ok)
 	{
 		_State = result;
 		return _State;
@@ -93,11 +93,12 @@ IOModulResult miModul::GPIOModul::ReadDriverSpecificOutputConfig(const rapidjson
 	return _State;
 }
 
-IOModulResult GPIOModul::Open(const std::string& configuration, const std::string& driverspecific)
+IOModulResult GPIOModul::Open(const std::string& descriptionFile,const std::string& driverspecific)
 {
-	_State = ReadModulConfiguration(configuration);
+	_State = ReadModulConfiguration(descriptionFile);
 	if (_State != IOModulResult::Ok)
 	{
+		std::cerr << __PRETTY_FUNCTION__ << " :Read description file failed. Errornumber " << _State << std::endl;
 		return _State;
 	}
 	_State = Init();
@@ -179,7 +180,7 @@ IOModulResult miModul::GPIOModul::GetGpioConfig(const rapidjson::Value& item, GP
 		{
 			return IOModulResult::ErrorConf;
 		}
-		bitOffset = item["bitOffset"].GetInt();
+		bitOffset = item["bitoffset"].GetInt();
 
 		if (!item.HasMember("driverspecific"))
 		{

@@ -1,6 +1,6 @@
 {
 	"mimoduldescription": {
-		"name": "migpiomodul",
+		"drivername": "migpiomodul",
 		"libname": "migpiomodul",
 		"modulconf": {
 			"inputbitsize": 8,

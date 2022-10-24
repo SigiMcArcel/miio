@@ -5,7 +5,7 @@
     "modulconf": {
       "inputbitsize": 0,
       "outputbitsize": 8,
-      "inputs": [
+      "outputs": [
         {
           "name": "DO1",
           "bitoffset": 0,

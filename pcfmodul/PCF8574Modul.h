@@ -6,36 +6,10 @@
 
 namespace miModul
 {
-	typedef enum PCFDirection_e
-	{
-		In,
-		Out
-	}PCFDirection;
-	
-	class PCFPinConfig
-	{
-	private:
-		PCFDirection _Direction;
-		int32_t _Id;
-		int32_t _Bit;
-	public:
-		PCFPinConfig() = default;
-		PCFPinConfig(PCFDirection direction, int32_t id, int32_t bit)
-			:_Direction(direction)
-			, _Id(id)
-			, _Bit(bit)
-		{}
-
-		const PCFDirection& Direction() const { return _Direction; };
-		const int32_t& Id() const { return _Id; };
-		const int32_t& Bit() const { return _Bit; };
-	};
-
 	class PCF8574Modul : public IOModulBase
 	{
 	private:
 		miDriver::I2CDriver _I2CDriver;
-		std::map<int32_t, PCFPinConfig> _PinConfiguration;
 		uint8_t _Address;
 
 		IOModulResult ResolveDriverSpecific(const std::string& driverspecific);

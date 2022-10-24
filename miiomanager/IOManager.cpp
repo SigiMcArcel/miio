@@ -1,8 +1,10 @@
 #include <dlfcn.h>
 #include <mi/miio/IOManager.h>
+#include <mi/miutils/Timer.h>
 #include <fstream>
 #include <iostream>
 #include <sstream> //std::stringstream
+
 
 using namespace miIOManager;
 
@@ -175,10 +177,39 @@ IOManagerResult IOManager::ReadIOModuleValueConfig(const rapidjson::Value& d,IOM
 IOManager::IOManager(miIOImage::IOImageSize inputImageSize, miIOImage::IOImageSize outputImageSize)
 	:_InputImage(inputImageSize, miIOImage::IOImageType::Input,"input")
 	, _OutputImage(outputImageSize, miIOImage::IOImageType::Output,"output")
+    , _ModulList()
     , _Timer("buscycle",this)
+    , _ActInputOffset(0)
+    , _ActOutputOffset(0)
+    , _IOModulPath("")
     , _State(IOManagerResult::Ok)
+
 {
 
+}
+
+miIOManager::IOManager::IOManager()
+    :_InputImage()
+    ,_OutputImage()
+    , _ModulList()
+    ,_Timer("buscycle", this)
+    ,_ActInputOffset(0)
+    ,_ActOutputOffset(0)
+    ,_IOModulPath("")
+    ,_State(IOManagerResult::Ok)
+{
+}
+
+miIOManager::IOManager::IOManager(const IOManager& other)
+    :_InputImage(other._InputImage)
+    , _OutputImage(other._OutputImage)
+    , _ModulList(other._ModulList)
+    , _Timer(other._Timer)
+    , _ActInputOffset(other._ActInputOffset)
+    , _ActOutputOffset(other._ActOutputOffset)
+    , _IOModulPath("")
+    , _State(other._State)
+{
 }
 
 IOManagerResult IOManager::AddIOModul(
@@ -226,6 +257,10 @@ IOManagerResult IOManager::RemoveIOModul(const std::string& name)
 IOManagerResult miIOManager::IOManager::ReadInputs()
 {
     miModul::IOModulResult result = miModul::IOModulResult::Ok;
+    if (_ModulList.empty())
+    {
+        return IOManagerResult::Ok;
+    }
     for (const auto& n : _ModulList)
     {
         if (!n.second.IOModul().Valid())
@@ -249,7 +284,7 @@ IOManagerResult miIOManager::IOManager::WriteOutputs()
     miModul::IOModulResult result = miModul::IOModulResult::Ok;
     for (const auto& n : _ModulList)
     {
-        if (n.second.IOModul().Valid())
+        if (!n.second.IOModul().Valid())
         {
             continue;
         }
@@ -330,13 +365,19 @@ IOManagerResult miIOManager::IOManager::IOModulControl(const std::string& name, 
 void miIOManager::IOManager::eventOccured(void* sender, const std::string& name)
 {
     miIOManager::IOManagerResult result = miIOManager::IOManagerResult::Ok;
-    miIOManager::IOManager* manager = reinterpret_cast<IOManager*>(sender);
+     miutils::Timer* timer = reinterpret_cast<miutils::Timer*>(sender);
     if (sender == nullptr)
     {
         _State = miIOManager::IOManagerResult::ErrorModulRead;
         return;
     }
-
+    if (timer->GetObject() == nullptr)
+    {
+        _State = miIOManager::IOManagerResult::ErrorModulRead;
+        return;
+    }
+    miIOManager::IOManager* manager = reinterpret_cast<miIOManager::IOManager*>(timer->GetObject());
+   
     result = manager->ReadInputs();
     if (result != miIOManager::IOManagerResult::Ok)
     {

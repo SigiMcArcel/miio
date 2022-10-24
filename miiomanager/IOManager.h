@@ -14,7 +14,7 @@
 namespace miIOManager
 {
 
-	typedef enum class IOManagerResult_e
+	typedef enum class IOManagerResult
 	{
 		Ok,
 		ErrorParameter,
@@ -134,6 +134,8 @@ private:
 
 public:
 	IOManager(miIOImage::IOImageSize inputImageSize, miIOImage::IOImageSize outputImageSize);
+	IOManager();
+	IOManager(const IOManager& other);
 		
 	IOManagerResult AddIOModul(
 		const std::string& instanceName

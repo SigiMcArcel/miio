@@ -62,7 +62,10 @@ miModul::IOModulResult miModul::IOModulBase::ReadModulConfiguration(const std::s
 		for (rapidjson::SizeType i = 0; i < inputs.Size(); i++)
 		{
 			_State = ReadDriverSpecificInputConfig(inputs[i]);
-			return _State;
+			if (_State != IOModulResult::Ok)
+			{
+				return _State;
+			}
 		}
 	}
 	std::cerr << "mimodule outputs " << std::endl;
@@ -77,8 +80,11 @@ miModul::IOModulResult miModul::IOModulBase::ReadModulConfiguration(const std::s
 
 		for (rapidjson::SizeType i = 0; i < outputs.Size(); i++)
 		{
-			_State = ReadDriverSpecificInputConfig(outputs[i]);
-			return _State;
+			_State = ReadDriverSpecificOutputConfig(outputs[i]);
+			if (_State != IOModulResult::Ok)
+			{
+				return _State;
+			}
 		}
 	}
 	return IOModulResult();

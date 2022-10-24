@@ -71,7 +71,7 @@
 					}
 				}
 			],
-			"outputs:": [
+			"outputs": [
 				{
 					"name": "pin12",
 					"bitoffset": 0,

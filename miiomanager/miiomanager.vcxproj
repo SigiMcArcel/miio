@@ -38,10 +38,14 @@
     <ClInclude Include="..\miiomodule\IOModulInterface.h" />
     <ClInclude Include="..\miiomodule\IOModul.h" />
     <ClInclude Include="IOManager.h" />
+    <ClInclude Include="Remoteserver.h" />
+    <ClInclude Include="UDPServer.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\miiomodule\IOModul.cpp" />
     <ClCompile Include="IOManager.cpp" />
+    <ClCompile Include="Remoteserver.cpp" />
+    <ClCompile Include="UDPServer.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{A5E38D44-6A3D-48D0-BD66-E4F417883D3D}</ProjectGuid>

@@ -8,16 +8,27 @@
     <ClInclude Include="..\miiomodule\IOModul.h">
       <Filter>IOModul</Filter>
     </ClInclude>
+    <ClInclude Include="Remoteserver.h">
+      <Filter>RemoteAccess</Filter>
+    </ClInclude>
+    <ClInclude Include="UDPServer.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="IOManager.cpp" />
     <ClCompile Include="..\miiomodule\IOModul.cpp">
       <Filter>IOModul</Filter>
     </ClCompile>
+    <ClCompile Include="Remoteserver.cpp">
+      <Filter>RemoteAccess</Filter>
+    </ClCompile>
+    <ClCompile Include="UDPServer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="IOModul">
       <UniqueIdentifier>{7b4f5e14-7231-472d-bb25-0f729f23943d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="RemoteAccess">
+      <UniqueIdentifier>{09a45076-868e-413b-b851-a483ff610c8f}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

@@ -5,12 +5,14 @@
       <Filter>miiomodule</Filter>
     </ClCompile>
     <ClCompile Include="Modul.cpp" />
+    <ClCompile Include="UDPServer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\miiomodule\IOModulBase.h">
       <Filter>miiomodule</Filter>
     </ClInclude>
     <ClInclude Include="Modul.h" />
+    <ClInclude Include="UDPServer.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="miiomodule">

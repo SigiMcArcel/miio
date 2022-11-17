@@ -90,10 +90,12 @@
   <ItemGroup>
     <ClInclude Include="..\miiomodule\IOModulBase.h" />
     <ClInclude Include="Modul.h" />
+    <ClInclude Include="UDPServer.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\miiomodule\IOModulBase.cpp" />
     <ClCompile Include="Modul.cpp" />
+    <ClCompile Include="UDPServer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="mitestmodul.json" />
